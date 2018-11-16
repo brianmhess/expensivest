@@ -6,13 +6,13 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 @SpringBootApplication
-public class ExpvestApplication extends SpringBootServletInitializer {
+public class ExpensivestApplication extends SpringBootServletInitializer {
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-		return application.sources(ExpvestApplication.class);
+		return application.sources(ExpensivestApplication.class);
 	}
 
 	public static void main(String[] args) {
-		SpringApplication.run(ExpvestApplication.class, args);
+		SpringApplication.run(ExpensivestApplication.class, args);
 	}
 }
