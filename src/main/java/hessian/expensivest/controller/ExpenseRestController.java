@@ -1,7 +1,7 @@
-package hessian.expvest.hessian.expvest.controller;
+package hessian.expensivest.controller;
 
-import hessian.expvest.domain.Expense;
-import hessian.expvest.repository.ExpenseRepository;
+import hessian.expensivest.domain.Expense;
+import hessian.expensivest.repository.ExpenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

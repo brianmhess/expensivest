@@ -1,4 +1,4 @@
-package hessian.expvest;
+package hessian.expensivest;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

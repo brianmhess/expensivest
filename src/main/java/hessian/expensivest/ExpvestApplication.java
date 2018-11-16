@@ -1,4 +1,4 @@
-package hessian.expvest;
+package hessian.expensivest;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

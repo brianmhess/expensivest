@@ -1,8 +1,7 @@
-package hessian.expvest.repository;
+package hessian.expensivest.repository;
 
-import hessian.expvest.domain.Expense;
-import hessian.expvest.domain.ExpensePrimaryKey;
-import org.springframework.data.cassandra.repository.AllowFiltering;
+import hessian.expensivest.domain.Expense;
+import hessian.expensivest.domain.ExpensePrimaryKey;
 import org.springframework.data.cassandra.repository.CassandraRepository;
 
 import java.util.List;

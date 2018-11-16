@@ -1,8 +1,6 @@
-package hessian.expvest.domain;
+package hessian.expensivest.domain;
 
-import com.datastax.driver.core.DataType;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
-import org.springframework.data.cassandra.core.mapping.CassandraType;
 import org.springframework.data.cassandra.core.mapping.PrimaryKeyClass;
 import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
 

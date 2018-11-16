@@ -1,4 +1,4 @@
-package hessian.expvest;
+package hessian.expensivest;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
