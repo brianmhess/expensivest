@@ -3,7 +3,7 @@
 
 ## Notes
 ### Getting Started
-To generate the basic pom.xml I navigated to https://start.stpring.io
+To generate the basic pom.xml I navigated to [https://start.spring.io](https://start.spring.io)
 From there I filled in the following:
 * Group: `hessian`
 * Artifact: `expensivest`
