@@ -8,7 +8,8 @@ import java.io.Serializable;
 
 @Table(value="expenses")
 public class Expense implements Serializable{
-    @PrimaryKey private ExpensePrimaryKey expensePrimaryKey;
+
+    @PrimaryKey private ExpensePrimaryKey key;
 
     @Column("category") private String category;
 
@@ -16,25 +17,21 @@ public class Expense implements Serializable{
 
     @Column("comment") private String comment;
 
-    public Expense(ExpensePrimaryKey expensePrimaryKey, String category, double amount, String comment) {
-        this.expensePrimaryKey = expensePrimaryKey;
+    public Expense(String category, Double amount, String comment, ExpensePrimaryKey key) {
         this.category = category;
         this.amount = amount;
         this.comment = comment;
+        this.key = key;
     }
 
+    @Override
     public String toString() {
-        return String.format("Expense[user=%s, trip=%s, expts=%s, category=%s, amount=%s, comment=%s",
-                expensePrimaryKey.getUser(), expensePrimaryKey.getTrip(), expensePrimaryKey.getExpts().toString(),
-                category, amount.toString(), comment);
-    }
-
-    public ExpensePrimaryKey getExpensePrimaryKey() {
-        return expensePrimaryKey;
-    }
-
-    public void setExpensePrimaryKey(ExpensePrimaryKey expensePrimaryKey) {
-        this.expensePrimaryKey = expensePrimaryKey;
+        return "Expense{" +
+                "category='" + category + '\'' +
+                ", amount=" + amount +
+                ", comment='" + comment + '\'' +
+                ", key=" + key +
+                '}';
     }
 
     public String getCategory() {
@@ -59,5 +56,13 @@ public class Expense implements Serializable{
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public ExpensePrimaryKey getKey() {
+        return key;
+    }
+
+    public void setKey(ExpensePrimaryKey key) {
+        this.key = key;
     }
 }

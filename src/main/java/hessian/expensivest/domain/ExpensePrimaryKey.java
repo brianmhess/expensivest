@@ -9,6 +9,7 @@ import java.util.Date;
 
 @PrimaryKeyClass
 public class ExpensePrimaryKey implements Serializable {
+
     @PrimaryKeyColumn(name = "user", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
     //@CassandraType(type = DataType.Name.TEXT)
     private String user;
@@ -21,6 +22,11 @@ public class ExpensePrimaryKey implements Serializable {
     //@CassandraType(type = DataType.Name.TIMESTAMP)
     private Date expts;
 
+    public ExpensePrimaryKey(String user, String trip, Date expts) {
+        this.user = user;
+        this.trip = trip;
+        this.expts = expts;
+    }
 
     public String getUser() {
         return user;
@@ -44,5 +50,35 @@ public class ExpensePrimaryKey implements Serializable {
 
     public void setTrip(String trip) {
         this.trip = trip;
+    }
+
+    @Override
+    public String toString() {
+        return "ExpensePrimaryKey{" +
+                "user='" + user + '\'' +
+                ", trip='" + trip + '\'' +
+                ", expts=" + expts +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ExpensePrimaryKey)) return false;
+
+        ExpensePrimaryKey that = (ExpensePrimaryKey) o;
+
+        if (!getUser().equals(that.getUser())) return false;
+        if (!getTrip().equals(that.getTrip())) return false;
+        return getExpts().equals(that.getExpts());
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getUser().hashCode();
+        result = 31 * result + getTrip().hashCode();
+        result = 31 * result + getExpts().hashCode();
+        return result;
     }
 }

@@ -41,3 +41,17 @@ CREATE TABLE IF NOT EXISTS exp.expenses(
 ) WITH CLUSTERING ORDER BY (trip ASC, expid DESC);
 
 ```
+
+### REST Endpoints
+
+```
+Endpoint                | Return
+------------------------|-----------------------------------------------------
+hello/                  | Prints Hello World
+api/                    | Prints all expenses
+api/{user}              | Prints all expenses for "user"
+api/{user}/{trip}       | Prints all expenses for "user" for "trip"
+api/category/{category} | Prints all expenses for "category"
+api/amount/gt/{amount}  | Prints all expenses for amount greater than "amount"
+api/add                 | Adds expense based on POSTed data
+```

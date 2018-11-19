@@ -18,6 +18,12 @@ public class ExpenseRestController {
         return "<html><body><H1>Hello World</H1></body></html>";
     }
 
+    @RequestMapping(value = "api/add", method = RequestMethod.POST)
+    public Expense createExpense(@RequestBody Expense expense) {
+        expenseRepository.save(expense);
+        return expense;
+    }
+
     @RequestMapping("api/")
     public List<Expense> all() {
         return (ArrayList<Expense>)expenseRepository.findAll();
@@ -25,12 +31,12 @@ public class ExpenseRestController {
 
     @RequestMapping("api/{user}")
     public List<Expense> user(@PathVariable String user) {
-        return (ArrayList<Expense>)expenseRepository.findByUser(user);
+        return (ArrayList<Expense>)expenseRepository.findByKeyUser(user);
     }
 
     @RequestMapping("api/{user}/{trip}")
     public List<Expense> userTrip(@PathVariable String user, @PathVariable String trip) {
-        return (ArrayList<Expense>)expenseRepository.findByUserAndTrip(user, trip);
+        return (ArrayList<Expense>)expenseRepository.findByKeyUserAndKeyTrip(user, trip);
     }
 
     @RequestMapping("api/category/{cat}")
@@ -38,9 +44,9 @@ public class ExpenseRestController {
         return (ArrayList<Expense>)expenseRepository.findByCategory(cat);
     }
 
-    @RequestMapping(value = "api/add", method = RequestMethod.POST)
-    public Expense createExpense(@RequestBody Expense expense) {
-        expenseRepository.save(expense);
-        return expense;
+    @RequestMapping("api/amount/gt/{amount}")
+    public List<Expense> category(@PathVariable double amount) {
+        return (ArrayList<Expense>)expenseRepository.findByAmountGreaterThan(amount);
     }
+
 }
