@@ -13,8 +13,8 @@ import javax.validation.constraints.NotNull;
 
 @Configuration
 public class ExpensivestConfiguration extends AbstractCassandraConfiguration {
-    //@Value("${dse.contactPoints})")
-    public String contactPoints = "127.0.0.1"; //"18.237.248.211";
+    @Value("${dse.contactPoints}")
+    public String contactPoints;
 
     //@Value("${dse.port}")
     private int port = 9042;

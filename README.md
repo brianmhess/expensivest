@@ -55,3 +55,10 @@ api/category/{category} | Prints all expenses for "category"
 api/amount/gt/{amount}  | Prints all expenses for amount greater than "amount"
 api/add                 | Adds expense based on POSTed data
 ```
+
+Examples:
+```curl http://localhost:8222/hello
+
+
+
+```
