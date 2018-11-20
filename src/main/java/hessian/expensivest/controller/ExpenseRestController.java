@@ -2,6 +2,7 @@ package hessian.expensivest.controller;
 
 import hessian.expensivest.domain.Expense;
 import hessian.expensivest.repository.ExpenseRepository;
+import hessian.expensivest.repository.ExpenseSearchRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +14,9 @@ public class ExpenseRestController {
     @Autowired
     private ExpenseRepository expenseRepository;
 
+    @Autowired
+    private ExpenseSearchRepository expenseSearchRepository;
+
     @RequestMapping("api/hello")
     public String hello() {
         return "<html><body><H1>Hello World</H1></body></html>";
@@ -21,6 +25,7 @@ public class ExpenseRestController {
     @RequestMapping(value = "api/add", method = RequestMethod.POST)
     public Expense createExpense(@RequestBody Expense expense) {
         expenseRepository.save(expense);
+        expenseSearchRepository.save(expense);
         return expense;
     }
 
