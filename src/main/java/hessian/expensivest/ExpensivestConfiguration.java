@@ -1,14 +1,12 @@
 package hessian.expensivest;
 
+import com.datastax.driver.dse.DseCluster;
+import com.datastax.driver.dse.DseSession;
+import com.datastax.driver.mapping.MappingManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.cassandra.config.AbstractCassandraConfiguration;
-import org.springframework.data.cassandra.config.CassandraClusterFactoryBean;
-import org.springframework.data.cassandra.core.mapping.BasicCassandraMappingContext;
-import org.springframework.data.cassandra.core.mapping.CassandraMappingContext;
-
-import javax.validation.constraints.NotNull;
 
 
 @Configuration
@@ -16,10 +14,10 @@ public class ExpensivestConfiguration extends AbstractCassandraConfiguration {
     @Value("${dse.contactPoints}")
     public String contactPoints;
 
-    //@Value("${dse.port}")
+    @Value("${dse.port}")
     private int port = 9042;
 
-    //@Value("${dse.keyspace}")
+    @Value("${dse.keyspace}")
     private String keyspace = "expensivest";
 
     public String getContactPoints() {
@@ -34,4 +32,24 @@ public class ExpensivestConfiguration extends AbstractCassandraConfiguration {
         return port;
     }
 
-}
+    @Bean
+    public DseCluster dseCluster() {
+        DseCluster.Builder dseClusterBuilder =
+                DseCluster.builder()
+                        .addContactPoints(contactPoints)
+                        .withPort(port);
+        return dseClusterBuilder.build();
+    }
+
+    @Bean
+    public DseSession dseSession(DseCluster dseCluster) {
+
+        return dseCluster.connect(keyspace);
+    }
+
+
+    @Bean
+    public MappingManager mappingManager(DseSession dseSession) {
+
+        return new MappingManager(dseSession);
+    }}
