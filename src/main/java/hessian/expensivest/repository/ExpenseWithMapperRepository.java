@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Repository
@@ -23,7 +24,6 @@ public class ExpenseWithMapperRepository {
     private MappingManager mappingManager;
     private Mapper<ExpenseWithMapper> mapper;
     private Session session;
-    //private SumCountAccessor sumCountAccessor;
 
     @Autowired
     public ExpenseWithMapperRepository(MappingManager mappingManager) {
@@ -101,31 +101,15 @@ public class ExpenseWithMapperRepository {
         return expenseWithMapper;
     }
 
-    /*
-    @Accessor
-    public interface SumCountAccessor {
-        @Query("SELECT SUM(amount) AS sum_val, COUNT(amount) AS count_val FROM expensivest.expenses")
-        SumCount sumCountGlobal();
-
-        @Query("SELECT user, SUM(amount) AS sum_val, COUNT(amount) AS count_val FROM expensivest.expenses GROUP BY user")
-        Result<SumCount> sumCountByUser();
-
-        @Query("SELECT user, trip, SUM(amount) AS sum_val, COUNT(amount) AS count_val FROM expensivest.expenses GROUP BY user, trip")
-        Result<SumCount> sumCountByUserAndTrip();
-    }
-    */
-
     private static String cqlSumCountGlobal = "SELECT SUM(amount) AS sum_val, COUNT(amount) AS count_val FROM expensivest.expenses";
     private PreparedStatement psSumCountGlobal;
     public SumCount sumCountGlobal() {
-        //return sumCountAccessor.sumCountGlobal();
         return new SumCount(session.execute(psSumCountGlobal.bind()).one());
     }
 
     private static String cqlSumCountByUser = "SELECT user, SUM(amount) AS sum_val, COUNT(amount) AS count_val FROM expensivest.expenses GROUP BY user";
     private PreparedStatement psSumCountByUser;
     public List<SumCount> sumCountByUser() {
-        //return sumCountAccessor.sumCountByUser().forEach(x -> new SumCount(x)).all();
         return session.execute(psSumCountByUser.bind()).all().stream().map(x -> new SumCount(x)).collect(Collectors.toList());
     }
 
@@ -150,15 +134,15 @@ public class ExpenseWithMapperRepository {
             this.sum_val = sum_val;
         }
 
-        private <T> T tryGet(Row r, String column, Class<T> klass) {
-            return r.getColumnDefinitions().contains(column) ? r.get(column, klass) : null;
+        private <T> T tryGet(Row r, String column, Class<T> klass, T otherwise) {
+            return r.getColumnDefinitions().contains(column) ? r.get(column, klass) : otherwise;
         }
 
         public SumCount(Row r) {
-            this.user = tryGet(r, "user", String.class);
-            this.trip = tryGet(r, "trip", String.class);
-            this.count_val = tryGet(r, "count_val", Long.class);
-            this.sum_val = tryGet(r, "sum_val", Double.class);
+            this.user = tryGet(r, "user", String.class, null);
+            this.trip = tryGet(r, "trip", String.class, null);
+            this.count_val = tryGet(r, "count_val", Long.class, null);
+            this.sum_val = tryGet(r, "sum_val", Double.class, null);
         }
 
         public String getUser() {
