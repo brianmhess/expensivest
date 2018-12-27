@@ -33,6 +33,7 @@ public class ExpenseWithMapperRepository {
     @PostConstruct
     private void init() {
         this.mapper = mappingManager.mapper(ExpenseWithMapper.class);
+        this.mapper.setDefaultSaveOptions(Mapper.Option.saveNullFields(false));
         this.session = mappingManager.getSession();
 
         psFindAll = session.prepare(builtFindAll); //session.prepare(cqlFindAll);
