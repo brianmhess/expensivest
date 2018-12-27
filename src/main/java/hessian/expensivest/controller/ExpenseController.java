@@ -154,6 +154,24 @@ public class ExpenseController {
         sb.append("    <div class=\"button\"><button type=\"submit\">Aggs By User And Trip</button></div>\n");
         sb.append("  </form>\n");
 
+        sb.append("  <hr>\n");
+        sb.append("  <h4>Delete Expense</h4>\n");
+        sb.append("  <form action=\"/ui/delete\" method=\"post\">\n");
+        sb.append("    <div>\n");
+        sb.append("      <label for=\"user\">User:</label>");
+        sb.append("      <input type=\"text\" id=\"user\" name=\"user\">");
+        sb.append("    <div>\n");
+        sb.append("    <div>\n");
+        sb.append("      <label for=\"trip\">Trip:</label>");
+        sb.append("      <input type=\"text\" id=\"trip\" name=\"trip\">");
+        sb.append("    <div>\n");
+        sb.append("    <div>\n");
+        sb.append("      <label for=\"expts\">When (<i>YYYY-MM-DD HH:MM:SS</i>):</label>");
+        sb.append("      <input type=\"text\" id=\"expts\" name=\"expts\">");
+        sb.append("    <div>\n");
+        sb.append("    <div class=\"button\"><button type=\"submit\">Delete Expense</button></div>\n");
+        sb.append("  </form>\n");
+
         sb.append("</div>\n");
         sb.append("</div>\n");
 
@@ -269,9 +287,16 @@ public class ExpenseController {
     @ResponseBody
     public String some(@RequestParam("user") String user,
                        @RequestParam("trip") String trip,
-                       @RequestParam("expts") Date expts) {
-        repository.delete(user, trip, expts);
-        return header() + makeTable(repository.findSome(10)) + forms() + footer();
+                       @RequestParam("expts") String expts) {
+        Date tdate = null;
+        try {
+            tdate = dateFormat.parse(expts);
+        }
+        catch (Exception e){
+            return header() + "<p>Couldn't parse date: expts = " + expts + forms() + footer();
+        }
+        repository.delete(user, trip, tdate);
+        return header() + makeTable(repository.findByKeyUserAndKeyTrip(user, trip)) + forms() + footer();
     }
 
     @RequestMapping(value = "ui/add", method = RequestMethod.POST)

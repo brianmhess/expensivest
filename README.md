@@ -56,6 +56,12 @@ CREATE TABLE IF NOT EXISTS expensivest.expenses_with_search(
 CREATE SEARCH INDEX IF NOT EXISTS ON expensivest.expenses_with_search;
 ```
 
+### Webpage
+Navigate to `http://localhost:8222/` to see a "Hello World" message.
+
+Navigate to `http://localhost:8222/ui/` to see a webpage interface to
+Expensivest, including create, delete, and various find queries.
+
 ### REST Endpoints
 
 ```
