@@ -69,24 +69,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Spring Data, extras -->
-		<dependency>
-			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-cassandra</artifactId>
-			<version>${spring-data.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>com.datastax.cassandra</groupId>
-					<artifactId>cassandra-driver-core</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-commons</artifactId>
-			<version>${spring-data.version}</version>
-		</dependency>
-
 	</dependencies>
 
 	<build>

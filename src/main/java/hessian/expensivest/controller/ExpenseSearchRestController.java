@@ -23,12 +23,12 @@ public class ExpenseSearchRestController {
         return (ArrayList<ExpenseWithSearch>)expenseSearchRepository.findAll();
     }
 
-    @RequestMapping("api/search/{user}")
+    @RequestMapping("api/search/user/{user}")
     public List<ExpenseWithSearch> user(@PathVariable String user) {
         return (ArrayList<ExpenseWithSearch>)expenseSearchRepository.findByKeyUser(user);
     }
 
-    @RequestMapping("api/search/{user}/{trip}")
+    @RequestMapping("api/search/user_trip/{user}/{trip}")
     public List<ExpenseWithSearch> userTrip(@PathVariable String user, @PathVariable String trip) {
         return (ArrayList<ExpenseWithSearch>)expenseSearchRepository.findByKeyUserAndKeyTrip(user, trip);
     }

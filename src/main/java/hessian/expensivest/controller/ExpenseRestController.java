@@ -34,12 +34,12 @@ public class ExpenseRestController {
         return (ArrayList<Expense>)expenseRepository.findAll();
     }
 
-    @RequestMapping("api/{user}")
+    @RequestMapping("api/user/{user}")
     public List<Expense> user(@PathVariable String user) {
         return (ArrayList<Expense>)expenseRepository.findByKeyUser(user);
     }
 
-    @RequestMapping("api/{user}/{trip}")
+    @RequestMapping("api/user_trip/{user}/{trip}")
     public List<Expense> userTrip(@PathVariable String user, @PathVariable String trip) {
         return (ArrayList<Expense>)expenseRepository.findByKeyUserAndKeyTrip(user, trip);
     }
