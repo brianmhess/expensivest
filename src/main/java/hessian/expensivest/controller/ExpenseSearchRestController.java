@@ -2,9 +2,11 @@ package hessian.expensivest.controller;
 
 import hessian.expensivest.domain.ExpenseWithSearch;
 import hessian.expensivest.repository.ExpenseSearchRepository;
+import hessian.typeparser.AnyParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,33 +26,33 @@ public class ExpenseSearchRestController {
     }
 
     @RequestMapping("api/search/user/{user}")
-    public List<ExpenseWithSearch> user(@PathVariable String user) {
-        return (ArrayList<ExpenseWithSearch>)expenseSearchRepository.findByKeyUser(user);
+    public List<ExpenseWithSearch> user(@PathVariable String user) throws ParseException {
+        return (ArrayList<ExpenseWithSearch>)expenseSearchRepository.findByKeyUser(AnyParser.parse(user, String.class));
     }
 
     @RequestMapping("api/search/user_trip/{user}/{trip}")
-    public List<ExpenseWithSearch> userTrip(@PathVariable String user, @PathVariable String trip) {
-        return (ArrayList<ExpenseWithSearch>)expenseSearchRepository.findByKeyUserAndKeyTrip(user, trip);
+    public List<ExpenseWithSearch> userTrip(@PathVariable String user, @PathVariable String trip) throws ParseException {
+        return (ArrayList<ExpenseWithSearch>)expenseSearchRepository.findByKeyUserAndKeyTrip(AnyParser.parse(user, String.class), AnyParser.parse(trip, String.class));
     }
 
     @RequestMapping("api/search/category/{cat}")
-    public List<ExpenseWithSearch> category(@PathVariable String cat) {
-        return (ArrayList<ExpenseWithSearch>)expenseSearchRepository.findByCategory(cat);
+    public List<ExpenseWithSearch> category(@PathVariable String cat) throws ParseException {
+        return (ArrayList<ExpenseWithSearch>)expenseSearchRepository.findByCategory(AnyParser.parse(cat, String.class));
     }
 
     @RequestMapping("api/search/category/like/{cat}")
-    public List<ExpenseWithSearch> categoryLike(@PathVariable String cat) {
-        return (ArrayList<ExpenseWithSearch>)expenseSearchRepository.findByCategoryLike(cat);
+    public List<ExpenseWithSearch> categoryLike(@PathVariable String cat) throws ParseException {
+        return (ArrayList<ExpenseWithSearch>)expenseSearchRepository.findByCategoryLike(AnyParser.parse(cat, String.class));
     }
 
     @RequestMapping("api/search/category/starting/{cat}")
-    public List<ExpenseWithSearch> categoryStarting(@PathVariable String cat) {
-        return (ArrayList<ExpenseWithSearch>)expenseSearchRepository.findByCategoryStartingWith(cat);
+    public List<ExpenseWithSearch> categoryStarting(@PathVariable String cat) throws ParseException {
+        return (ArrayList<ExpenseWithSearch>)expenseSearchRepository.findByCategoryStartingWith(AnyParser.parse(cat, String.class));
     }
 
     @RequestMapping("api/search/amount/gt/{amount}")
-    public List<ExpenseWithSearch> category(@PathVariable double amount) {
-        return (ArrayList<ExpenseWithSearch>)expenseSearchRepository.findByAmountGreaterThan(amount);
+    public List<ExpenseWithSearch> amount_gt(@PathVariable String amount) throws ParseException {
+        return (ArrayList<ExpenseWithSearch>)expenseSearchRepository.findByAmountGreaterThan(AnyParser.parse(amount, Double.class));
     }
 
 }

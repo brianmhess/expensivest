@@ -4,7 +4,9 @@ import com.datastax.driver.mapping.annotations.ClusteringColumn;
 import com.datastax.driver.mapping.annotations.Column;
 import com.datastax.driver.mapping.annotations.PartitionKey;
 import com.datastax.driver.mapping.annotations.Table;
+import hessian.typeparser.AnyParser;
 
+import java.text.ParseException;
 import java.util.Date;
 import java.util.Objects;
 
