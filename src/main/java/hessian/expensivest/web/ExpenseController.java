@@ -1,8 +1,8 @@
-package hessian.expensivest.controller;
+package hessian.expensivest.web;
 
 import com.google.common.collect.Lists;
-import hessian.expensivest.domain.ExpenseWithMapper;
-import hessian.expensivest.repository.ExpenseWithMapperRepository;
+import hessian.expensivest.mapper.Expense;
+import hessian.expensivest.mapper.ExpenseRepositoryMapper;
 import hessian.typeparser.AnyParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -20,7 +19,7 @@ import java.util.List;
 @Controller
 public class ExpenseController {
     @Autowired
-    private ExpenseWithMapperRepository repository;
+    private ExpenseRepositoryMapper repository;
     private AnyParser anyParser = AnyParser.defaultParser;
 
     private String header() {
@@ -52,7 +51,7 @@ public class ExpenseController {
                 "</p>");
         sb.append("<div class=\"collapse\" id=\"forms\">\n");
         sb.append("  <h4>Find Some</h4>\n");
-        sb.append("  <form action=\"/ui/some\" method=\"post\">\n");
+        sb.append("  <form action=\"/web/some\" method=\"post\">\n");
         sb.append("    <div>\n");
         sb.append("      <label for=\"some\">How Many:</label>");
         sb.append("      <input type=\"text\" id=\"some\" name=\"some\" required pattern=\"[0-9]+\">");
@@ -62,7 +61,7 @@ public class ExpenseController {
 
         sb.append("  <hr>\n");
         sb.append("  <h4>New Expense</h4>\n");
-        sb.append("  <form action=\"/ui/add\" method=\"post\">\n");
+        sb.append("  <form action=\"/web/add\" method=\"post\">\n");
         sb.append("    <div>\n");
         sb.append("      <label for=\"user\">User:</label>");
         sb.append("      <input type=\"text\" id=\"user\" name=\"user\" required>");
@@ -92,7 +91,7 @@ public class ExpenseController {
 
         sb.append("  <hr>\n");
         sb.append("  <h4>Find By User</h4>\n");
-        sb.append("  <form action=\"/ui/user\" method=\"post\">\n");
+        sb.append("  <form action=\"/web/user\" method=\"post\">\n");
         sb.append("    <div>\n");
         sb.append("      <label for=\"user\">User:</label>");
         sb.append("      <input type=\"text\" id=\"user\" name=\"user\" required>");
@@ -102,7 +101,7 @@ public class ExpenseController {
 
         sb.append("  <hr>\n");
         sb.append("  <h4>Find By User And Trip</h4>\n");
-        sb.append("  <form action=\"/ui/user_trip\" method=\"post\">\n");
+        sb.append("  <form action=\"/web/user_trip\" method=\"post\">\n");
         sb.append("    <div>\n");
         sb.append("      <label for=\"user\">User:</label>");
         sb.append("      <input type=\"text\" id=\"user\" name=\"user\" required>");
@@ -116,7 +115,7 @@ public class ExpenseController {
 
         sb.append("  <hr>\n");
         sb.append("  <h4>Find By Category</h4>\n");
-        sb.append("  <form action=\"/ui/category\" method=\"post\">\n");
+        sb.append("  <form action=\"/web/category\" method=\"post\">\n");
         sb.append("    <div>\n");
         sb.append("      <label for=\"category\">Category:</label>");
         sb.append("      <input type=\"text\" id=\"category\" name=\"category\" required>");
@@ -125,8 +124,28 @@ public class ExpenseController {
         sb.append("  </form>\n");
 
         sb.append("  <hr>\n");
+        sb.append("  <h4>Find By Category Like</h4>\n");
+        sb.append("  <form action=\"/web/category/like\" method=\"post\">\n");
+        sb.append("    <div>\n");
+        sb.append("      <label for=\"category\">Category:</label>");
+        sb.append("      <input type=\"text\" id=\"category\" name=\"category\" required>");
+        sb.append("    <div>\n");
+        sb.append("    <div class=\"button\"><button type=\"submit\">Find By Category Like</button></div>\n");
+        sb.append("  </form>\n");
+
+        sb.append("  <hr>\n");
+        sb.append("  <h4>Find By Category Starting With</h4>\n");
+        sb.append("  <form action=\"/web/category/starting\" method=\"post\">\n");
+        sb.append("    <div>\n");
+        sb.append("      <label for=\"category\">Category:</label>");
+        sb.append("      <input type=\"text\" id=\"category\" name=\"category\" required>");
+        sb.append("    <div>\n");
+        sb.append("    <div class=\"button\"><button type=\"submit\">Find By Category Starting With</button></div>\n");
+        sb.append("  </form>\n");
+
+        sb.append("  <hr>\n");
         sb.append("  <h4>Find Big Expenses</h4>\n");
-        sb.append("  <form action=\"/ui/amount_gt\" method=\"post\">\n");
+        sb.append("  <form action=\"/web/amount/gt\" method=\"post\">\n");
         sb.append("    <div>\n");
         sb.append("      <label for=\"amount\">Minimum Amount:</label>");
         sb.append("      <input type=\"text\" id=\"amount\" name=\"amount\" required>");
@@ -136,25 +155,25 @@ public class ExpenseController {
 
         sb.append("  <hr>\n");
         sb.append("  <h4>Global Aggregates</h4>\n");
-        sb.append("  <form action=\"/ui/agg_global\" method=\"post\">\n");
+        sb.append("  <form action=\"/web/sum_count/global\" method=\"post\">\n");
         sb.append("    <div class=\"button\"><button type=\"submit\">Global Aggregates</button></div>\n");
         sb.append("  </form>\n");
 
         sb.append("  <hr>\n");
         sb.append("  <h4>Aggregates By User</h4>\n");
-        sb.append("  <form action=\"/ui/agg_user\" method=\"post\">\n");
+        sb.append("  <form action=\"/web/sum_count/user\" method=\"post\">\n");
         sb.append("    <div class=\"button\"><button type=\"submit\">Aggs By User</button></div>\n");
         sb.append("  </form>\n");
 
         sb.append("  <hr>\n");
         sb.append("  <h4>Aggregates By User And Trip</h4>\n");
-        sb.append("  <form action=\"/ui/agg_user_trip\" method=\"post\">\n");
+        sb.append("  <form action=\"/web/sum_count/user_and_trip\" method=\"post\">\n");
         sb.append("    <div class=\"button\"><button type=\"submit\">Aggs By User And Trip</button></div>\n");
         sb.append("  </form>\n");
 
         sb.append("  <hr>\n");
         sb.append("  <h4>Delete Expense</h4>\n");
-        sb.append("  <form action=\"/ui/delete\" method=\"post\">\n");
+        sb.append("  <form action=\"/web/delete\" method=\"post\">\n");
         sb.append("    <div>\n");
         sb.append("      <label for=\"user\">User:</label>");
         sb.append("      <input type=\"text\" id=\"user\" name=\"user\" required>");
@@ -183,8 +202,8 @@ public class ExpenseController {
                 "</body>\n</html>\n";
     }
 
-    private String makeTable(List<ExpenseWithMapper> expenses) {
-        expenses.sort(new Comparator<ExpenseWithMapper>() {
+    private String makeTable(List<Expense> expenses) {
+        expenses.sort(new Comparator<Expense>() {
             private int compareNulls(Object o1, Object o2) {
                 if (null == o1) {
                     if (null == o2)
@@ -197,7 +216,7 @@ public class ExpenseController {
                 return 2;
             }
             @Override
-            public int compare(ExpenseWithMapper e1, ExpenseWithMapper e2) {
+            public int compare(Expense e1, Expense e2) {
                 int ret = compareNulls(e1, e2);
                 if (2 != ret)
                     return ret;
@@ -236,7 +255,7 @@ public class ExpenseController {
         sb.append("    <th>Comment</th>\n");
         sb.append("  </tr>\n");
         try {
-            for (ExpenseWithMapper e : expenses) {
+            for (Expense e : expenses) {
                 sb.append("  <tr>\n");
                 sb.append("    <td>" + anyParser.format(e.getUser()) + "</td>\n");
                 sb.append("    <td>" + anyParser.format(e.getTrip()) + "</td>\n");
@@ -255,8 +274,8 @@ public class ExpenseController {
         return sb.toString();
     }
 
-    private String makeAggTable(List<ExpenseWithMapperRepository.SumCount> aggs) {
-        aggs.sort(new Comparator<ExpenseWithMapperRepository.SumCount>() {
+    private String makeAggTable(List<ExpenseRepositoryMapper.SumCount> aggs) {
+        aggs.sort(new Comparator<ExpenseRepositoryMapper.SumCount>() {
             private int compareNulls(Object o1, Object o2) {
                 if (null == o1) {
                     if (null == o2)
@@ -269,7 +288,7 @@ public class ExpenseController {
                 return 2;
             }
             @Override
-            public int compare(ExpenseWithMapperRepository.SumCount e1, ExpenseWithMapperRepository.SumCount e2) {
+            public int compare(ExpenseRepositoryMapper.SumCount e1, ExpenseRepositoryMapper.SumCount e2) {
                 int ret = compareNulls(e1, e2);
                 if (2 != ret)
                     return ret;
@@ -296,7 +315,7 @@ public class ExpenseController {
         sb.append("    <th>Sum</th>\n");
         sb.append("  </tr>\n");
         try {
-            for (ExpenseWithMapperRepository.SumCount e : aggs) {
+            for (ExpenseRepositoryMapper.SumCount e : aggs) {
                 sb.append("  <tr>\n");
                 //sb.append("    <td>" + ((null == e.getUser()) ? "null" : anyParser.format(e.getUser())) + "</td>\n");
                 //sb.append("    <td>" + ((null == e.getTrip()) ? "null" : anyParser.format(e.getTrip())) + "</td>\n");
@@ -324,6 +343,8 @@ public class ExpenseController {
     @RequestMapping("/")
     @ResponseBody
     public String hello() {
+        return returnString("<h4>Hello World</h4>");
+        /*
         return "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <title>My test page</title>\n  </head>\n<body>" +
                 "<table>" +
                 "<td><image src=\"/vest.png\" title=\"Expensivest\" width=\"100\" height=\"100\"></td>" +
@@ -331,23 +352,24 @@ public class ExpenseController {
                 "</table>" +
                 "<hr>" +
                 "<h4>Hello World</h4></body></html>";
+                */
     }
 
-    @RequestMapping("ui/")
+    @RequestMapping("web")
     @ResponseBody
     public String index() {
-        return returnString(makeAggTable(repository.sumCountByUserAndTrip()));
+        return returnString("<h4>Sum/Count by User and Trip</h4>" + makeAggTable(repository.sumCountByUserAndTrip()));
     }
 
-    @RequestMapping(value = "ui/some", method = RequestMethod.POST)
+    @RequestMapping(value = "web/some", method = RequestMethod.POST)
     @ResponseBody
     public String some(@RequestParam("some") String some) throws ParseException{
-        return returnString(makeTable(repository.findSome(anyParser.parse(some, Integer.class))));
+        return returnString("<h4>" + some + " records</h4>" + makeTable(repository.findSome(anyParser.parse(some, Integer.class))));
     }
 
-    @RequestMapping(value = "ui/delete", method = RequestMethod.POST)
+    @RequestMapping(value = "web/delete", method = RequestMethod.POST)
     @ResponseBody
-    public String some(@RequestParam("user") String user,
+    public String delete(@RequestParam("user") String user,
                        @RequestParam("trip") String trip,
                        @RequestParam("expts") String expts)  throws ParseException {
         Date tdate = anyParser.parse(expts, Date.class);
@@ -355,7 +377,7 @@ public class ExpenseController {
         return returnString(makeTable(repository.findByKeyUserAndKeyTrip(user, trip)));
     }
 
-    @RequestMapping(value = "ui/add", method = RequestMethod.POST)
+    @RequestMapping(value = "web/add", method = RequestMethod.POST)
     @ResponseBody
     public String add(@RequestParam("user") String user,
                       @RequestParam("trip") String trip,
@@ -365,51 +387,63 @@ public class ExpenseController {
                       @RequestParam("comment") String comment) throws  ParseException {
         Date tdate = anyParser.parse(expts, Date.class);
         Double tdouble = anyParser.parse(amount, Double.class);
-        ExpenseWithMapper e = new ExpenseWithMapper(user, trip, tdate, tdouble, category, comment);
+        Expense e = new Expense(user, trip, tdate, tdouble, category, comment);
         repository.save(user, trip, expts, amount, category, comment);
-        return returnString(makeTable(Lists.newArrayList(e)));
+        return returnString("<h4>Created new record</h4>" + makeTable(Lists.newArrayList(e)));
     }
 
-    @RequestMapping(value = "ui/user", method = RequestMethod.POST)
+    @RequestMapping(value = "web/user", method = RequestMethod.POST)
     @ResponseBody
     public String user(@RequestParam("user") String user) throws ParseException {
-        return returnString(makeTable(repository.findByKeyUser(anyParser.parse(user, String.class))));
+        return returnString("<h4>Records for " + user + "</h4>" + makeTable(repository.findByKeyUser(anyParser.parse(user, String.class))));
     }
 
-    @RequestMapping(value = "ui/user_trip", method = RequestMethod.POST)
+    @RequestMapping(value = "web/user_trip", method = RequestMethod.POST)
     @ResponseBody
     public String user_trip(@RequestParam("user") String user, @RequestParam("trip") String trip) throws ParseException {
-        return returnString(makeTable(repository.findByKeyUserAndKeyTrip(anyParser.parse(user, String.class), anyParser.parse(trip, String.class))));
+        return returnString("<h4>Records for " + user + " and trip " + trip + "</h4>" + makeTable(repository.findByKeyUserAndKeyTrip(anyParser.parse(user, String.class), anyParser.parse(trip, String.class))));
     }
 
-    @RequestMapping(value = "ui/category", method = RequestMethod.POST)
+    @RequestMapping(value = "web/category", method = RequestMethod.POST)
     @ResponseBody
     public String category(@RequestParam("category") String category) throws ParseException {
-        return returnString(makeTable(repository.findByCategory(anyParser.parse(category, String.class))));
+        return returnString("<h4>Records for category " + category + "</h4>" + makeTable(repository.findByCategory(anyParser.parse(category, String.class))));
     }
 
-    @RequestMapping(value = "ui/amount_gt", method = RequestMethod.POST)
+    @RequestMapping(value = "web/category/like", method = RequestMethod.POST)
+    @ResponseBody
+    public String categoryLike(@RequestParam String category) throws ParseException {
+        return returnString("<h4>Records for category like " + category + "</h4>" + makeTable(repository.findByCategoryLike(anyParser.parse(category, String.class))));
+    }
+
+    @RequestMapping(value = "web/category/starting", method = RequestMethod.POST)
+    @ResponseBody
+    public String categoryStarts(@RequestParam String category) throws ParseException {
+        return returnString("<h4>Records for category starting " + category + "</h4>" + makeTable(repository.findByCategoryStartingWith(anyParser.parse(category, String.class))));
+    }
+
+    @RequestMapping(value = "web/amount/gt", method = RequestMethod.POST)
     @ResponseBody
     public String amount_gt(@RequestParam("amount") String amount) throws ParseException {
-        return returnString(makeTable(repository.findByAmountGreaterThan(anyParser.parse(amount, Double.class))));
+        return returnString("<h4>Records with amount greater than " + amount + "</h4>" + makeTable(repository.findByAmountGreaterThan(anyParser.parse(amount, Double.class))));
     }
 
-    @RequestMapping(value = "ui/agg_global", method = RequestMethod.POST)
+    @RequestMapping(value = "web/sum_count/global", method = RequestMethod.POST)
     @ResponseBody
     public String agg_global() {
-        return returnString(makeAggTable(Lists.newArrayList(repository.sumCountGlobal())));
+        return returnString("<h4>Global statistics</h4>" + makeAggTable(Lists.newArrayList(repository.sumCountGlobal())));
     }
 
-    @RequestMapping(value = "ui/agg_user", method = RequestMethod.POST)
+    @RequestMapping(value = "web/sum_count/user", method = RequestMethod.POST)
     @ResponseBody
     public String agg_user() {
-        return returnString(makeAggTable(repository.sumCountByUser()));
+        return returnString("<h4>Statistics by User</h4>" + makeAggTable(repository.sumCountByUser()));
     }
 
-    @RequestMapping(value = "ui/agg_user_trip", method = RequestMethod.POST)
+    @RequestMapping(value = "web/sum_count/user_and_trip", method = RequestMethod.POST)
     @ResponseBody
     public String agg_user_trip() {
-        return returnString(makeAggTable(repository.sumCountByUserAndTrip()));
+        return returnString("<h4>Statistics by User and Trip</h4>" + makeAggTable(repository.sumCountByUserAndTrip()));
     }
 
 }

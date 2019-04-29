@@ -1,17 +1,16 @@
-package hessian.expensivest.domain;
+package hessian.expensivest.mapper;
 
 import com.datastax.driver.mapping.annotations.ClusteringColumn;
 import com.datastax.driver.mapping.annotations.Column;
 import com.datastax.driver.mapping.annotations.PartitionKey;
 import com.datastax.driver.mapping.annotations.Table;
-import hessian.typeparser.AnyParser;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
-import java.text.ParseException;
 import java.util.Date;
 import java.util.Objects;
 
 @Table(name ="expenses", keyspace = "expensivest")
-public class ExpenseWithMapper {
+public class Expense {
     @PartitionKey(0)
     @Column
     private String user;
@@ -22,6 +21,7 @@ public class ExpenseWithMapper {
 
     @ClusteringColumn(0)
     @Column
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date expts;
 
     @Column
@@ -33,9 +33,9 @@ public class ExpenseWithMapper {
     @Column
     private String comment;
 
-    public ExpenseWithMapper() { }
+    public Expense() { }
 
-    public ExpenseWithMapper(String user, String trip, Date expts, Double amount, String category, String comment) {
+    public Expense(String user, String trip, Date expts, Double amount, String category, String comment) {
         this.user = user;
         this.trip = trip;
         this.expts = expts;
@@ -46,7 +46,7 @@ public class ExpenseWithMapper {
 
     @Override
     public String toString() {
-        return "ExpenseWithMapper{" +
+        return "Expense{" +
                 "user='" + user + '\'' +
                 ", trip='" + trip + '\'' +
                 ", expts=" + expts +
@@ -107,8 +107,8 @@ public class ExpenseWithMapper {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ExpenseWithMapper)) return false;
-        ExpenseWithMapper that = (ExpenseWithMapper) o;
+        if (!(o instanceof Expense)) return false;
+        Expense that = (Expense) o;
         return Objects.equals(getUser(), that.getUser()) &&
                 Objects.equals(getTrip(), that.getTrip()) &&
                 Objects.equals(getExpts(), that.getExpts()) &&
