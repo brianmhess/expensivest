@@ -1,10 +1,6 @@
 package hessian.expensivest;
 
-import com.datastax.driver.dse.DseCluster;
-import com.datastax.driver.dse.DseSession;
-import com.datastax.driver.mapping.MappingManager;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.cassandra.config.AbstractCassandraConfiguration;
 
@@ -31,25 +27,4 @@ public class ExpensivestConfiguration extends AbstractCassandraConfiguration {
     public int getPort() {
         return port;
     }
-
-    @Bean
-    public DseCluster dseCluster() {
-        DseCluster.Builder dseClusterBuilder =
-                DseCluster.builder()
-                        .addContactPoints(contactPoints)
-                        .withPort(port);
-        return dseClusterBuilder.build();
-    }
-
-    @Bean
-    public DseSession dseSession(DseCluster dseCluster) {
-
-        return dseCluster.connect(keyspace);
-    }
-
-
-    @Bean
-    public MappingManager mappingManager(DseSession dseSession) {
-
-        return new MappingManager(dseSession);
-    }}
+}

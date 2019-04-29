@@ -13,6 +13,7 @@ import java.util.List;
 public class ExpenseWithMapperRestController {
     @Autowired
     private ExpenseWithMapperRepository repository;
+    private AnyParser anyParser = new AnyParser();
 
     @RequestMapping("api/dse/hello")
     public String hello() {
@@ -37,27 +38,27 @@ public class ExpenseWithMapperRestController {
 
     @RequestMapping("api/dse/some/{some}")
     public List<ExpenseWithMapper> some(@PathVariable String some) throws ParseException {
-        return repository.findSome(AnyParser.parse(some, Integer.class));
+        return repository.findSome(anyParser.parse(some, Integer.class));
     }
 
     @RequestMapping("api/dse/user/{user}")
     public List<ExpenseWithMapper> user(@PathVariable String user) throws ParseException {
-        return repository.findByKeyUser(AnyParser.parse(user, String.class));
+        return repository.findByKeyUser(anyParser.parse(user, String.class));
     }
 
     @RequestMapping("api/dse/user_trip/{user}/{trip}")
     public List<ExpenseWithMapper> userTrip(@PathVariable String user, @PathVariable String trip) throws ParseException {
-        return repository.findByKeyUserAndKeyTrip(AnyParser.parse(user, String.class), AnyParser.parse(trip, String.class));
+        return repository.findByKeyUserAndKeyTrip(anyParser.parse(user, String.class), anyParser.parse(trip, String.class));
     }
 
     @RequestMapping("api/dse/category/{cat}")
     public List<ExpenseWithMapper> category(@PathVariable String cat) throws ParseException {
-        return repository.findByCategory(AnyParser.parse(cat, String.class));
+        return repository.findByCategory(anyParser.parse(cat, String.class));
     }
 
     @RequestMapping("api/dse/amount/gt/{amount}")
     public List<ExpenseWithMapper> amountGreaterThan(@PathVariable String amount) throws ParseException {
-        return repository.findByAmountGreaterThan(AnyParser.parse(amount, Double.class));
+        return repository.findByAmountGreaterThan(anyParser.parse(amount, Double.class));
     }
 
     @RequestMapping("api/dse/sum_count/global")

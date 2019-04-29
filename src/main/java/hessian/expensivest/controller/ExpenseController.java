@@ -16,14 +16,12 @@ import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.function.Function;
 
 @Controller
 public class ExpenseController {
     @Autowired
     private ExpenseWithMapperRepository repository;
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
+    private AnyParser anyParser = AnyParser.defaultParser;
 
     private String header() {
         StringBuilder sb = new StringBuilder();
@@ -240,12 +238,12 @@ public class ExpenseController {
         try {
             for (ExpenseWithMapper e : expenses) {
                 sb.append("  <tr>\n");
-                sb.append("    <td>" + AnyParser.format(e.getUser()) + "</td>\n");
-                sb.append("    <td>" + AnyParser.format(e.getTrip()) + "</td>\n");
-                sb.append("    <td>" + AnyParser.format(e.getExpts()) + "</td>\n");
-                sb.append("    <td>" + AnyParser.format(e.getCategory()) + "</td>\n");
-                sb.append("    <td>" + AnyParser.format(e.getAmount()) + "</td>\n");
-                sb.append("    <td>" + AnyParser.format(e.getComment()) + "</td>\n");
+                sb.append("    <td>" + anyParser.format(e.getUser()) + "</td>\n");
+                sb.append("    <td>" + anyParser.format(e.getTrip()) + "</td>\n");
+                sb.append("    <td>" + anyParser.format(e.getExpts()) + "</td>\n");
+                sb.append("    <td>" + anyParser.format(e.getCategory()) + "</td>\n");
+                sb.append("    <td>" + anyParser.format(e.getAmount()) + "</td>\n");
+                sb.append("    <td>" + anyParser.format(e.getComment()) + "</td>\n");
                 sb.append("  </tr>\n");
             }
         }
@@ -300,14 +298,14 @@ public class ExpenseController {
         try {
             for (ExpenseWithMapperRepository.SumCount e : aggs) {
                 sb.append("  <tr>\n");
-                //sb.append("    <td>" + ((null == e.getUser()) ? "null" : AnyParser.format(e.getUser())) + "</td>\n");
-                //sb.append("    <td>" + ((null == e.getTrip()) ? "null" : AnyParser.format(e.getTrip())) + "</td>\n");
-                //sb.append("    <td>" + ((null == e.getCount_val()) ? "null" : AnyParser.format(e.getCount_val())) + "</td>\n");
-                //sb.append("    <td>" + ((null == e.getSum_val()) ? "null" : AnyParser.format(e.getSum_val())) + "</td>\n");
-                sb.append("    <td>" + AnyParser.format(e.getUser()) + "</td>\n");
-                sb.append("    <td>" + AnyParser.format(e.getTrip()) + "</td>\n");
-                sb.append("    <td>" + AnyParser.format(e.getCount_val()) + "</td>\n");
-                sb.append("    <td>" + AnyParser.format(e.getSum_val()) + "</td>\n");
+                //sb.append("    <td>" + ((null == e.getUser()) ? "null" : anyParser.format(e.getUser())) + "</td>\n");
+                //sb.append("    <td>" + ((null == e.getTrip()) ? "null" : anyParser.format(e.getTrip())) + "</td>\n");
+                //sb.append("    <td>" + ((null == e.getCount_val()) ? "null" : anyParser.format(e.getCount_val())) + "</td>\n");
+                //sb.append("    <td>" + ((null == e.getSum_val()) ? "null" : anyParser.format(e.getSum_val())) + "</td>\n");
+                sb.append("    <td>" + anyParser.format(e.getUser()) + "</td>\n");
+                sb.append("    <td>" + anyParser.format(e.getTrip()) + "</td>\n");
+                sb.append("    <td>" + anyParser.format(e.getCount_val()) + "</td>\n");
+                sb.append("    <td>" + anyParser.format(e.getSum_val()) + "</td>\n");
                 sb.append("  </tr>\n");
             }
         }
@@ -338,13 +336,13 @@ public class ExpenseController {
     @RequestMapping("ui/")
     @ResponseBody
     public String index() {
-        return returnString(makeTable(repository.findSome(10)));
+        return returnString(makeAggTable(repository.sumCountByUserAndTrip()));
     }
 
     @RequestMapping(value = "ui/some", method = RequestMethod.POST)
     @ResponseBody
     public String some(@RequestParam("some") String some) throws ParseException{
-        return returnString(makeTable(repository.findSome(AnyParser.parse(some, Integer.class))));
+        return returnString(makeTable(repository.findSome(anyParser.parse(some, Integer.class))));
     }
 
     @RequestMapping(value = "ui/delete", method = RequestMethod.POST)
@@ -352,7 +350,7 @@ public class ExpenseController {
     public String some(@RequestParam("user") String user,
                        @RequestParam("trip") String trip,
                        @RequestParam("expts") String expts)  throws ParseException {
-        Date tdate = AnyParser.parse(expts, Date.class);
+        Date tdate = anyParser.parse(expts, Date.class);
         repository.delete(user, trip, tdate);
         return returnString(makeTable(repository.findByKeyUserAndKeyTrip(user, trip)));
     }
@@ -365,8 +363,8 @@ public class ExpenseController {
                       @RequestParam("amount") String amount,
                       @RequestParam("category") String category,
                       @RequestParam("comment") String comment) throws  ParseException {
-        Date tdate = AnyParser.parse(expts, Date.class);
-        Double tdouble = AnyParser.parse(amount, Double.class);
+        Date tdate = anyParser.parse(expts, Date.class);
+        Double tdouble = anyParser.parse(amount, Double.class);
         ExpenseWithMapper e = new ExpenseWithMapper(user, trip, tdate, tdouble, category, comment);
         repository.save(user, trip, expts, amount, category, comment);
         return returnString(makeTable(Lists.newArrayList(e)));
@@ -375,25 +373,25 @@ public class ExpenseController {
     @RequestMapping(value = "ui/user", method = RequestMethod.POST)
     @ResponseBody
     public String user(@RequestParam("user") String user) throws ParseException {
-        return returnString(makeTable(repository.findByKeyUser(AnyParser.parse(user, String.class))));
+        return returnString(makeTable(repository.findByKeyUser(anyParser.parse(user, String.class))));
     }
 
     @RequestMapping(value = "ui/user_trip", method = RequestMethod.POST)
     @ResponseBody
     public String user_trip(@RequestParam("user") String user, @RequestParam("trip") String trip) throws ParseException {
-        return returnString(makeTable(repository.findByKeyUserAndKeyTrip(AnyParser.parse(user, String.class), AnyParser.parse(trip, String.class))));
+        return returnString(makeTable(repository.findByKeyUserAndKeyTrip(anyParser.parse(user, String.class), anyParser.parse(trip, String.class))));
     }
 
     @RequestMapping(value = "ui/category", method = RequestMethod.POST)
     @ResponseBody
     public String category(@RequestParam("category") String category) throws ParseException {
-        return returnString(makeTable(repository.findByCategory(AnyParser.parse(category, String.class))));
+        return returnString(makeTable(repository.findByCategory(anyParser.parse(category, String.class))));
     }
 
     @RequestMapping(value = "ui/amount_gt", method = RequestMethod.POST)
     @ResponseBody
     public String amount_gt(@RequestParam("amount") String amount) throws ParseException {
-        return returnString(makeTable(repository.findByAmountGreaterThan(AnyParser.parse(amount, Double.class))));
+        return returnString(makeTable(repository.findByAmountGreaterThan(anyParser.parse(amount, Double.class))));
     }
 
     @RequestMapping(value = "ui/agg_global", method = RequestMethod.POST)

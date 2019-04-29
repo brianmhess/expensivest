@@ -28,10 +28,20 @@
 		<spring-data.version>2.0.7.RELEASE</spring-data.version>
 	</properties>
 
+	<!--
 	<repositories>
 		<repository>
 			<id>data-local</id>
 			<name>data</name>
+			<url>file://${project.basedir}/repo</url>
+		</repository>
+	</repositories>
+	-->
+
+	<repositories>
+		<repository>
+			<id>data-local</id>
+			<name>datat2</name>
 			<url>file://${project.basedir}/repo</url>
 		</repository>
 	</repositories>

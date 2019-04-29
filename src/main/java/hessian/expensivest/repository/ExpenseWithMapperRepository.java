@@ -74,7 +74,6 @@ public class ExpenseWithMapperRepository {
     // Delete
     public void delete(String user, String trip, Date expts) {
         mapper.delete(user, trip, expts);
-        ExpenseWithMapper e = new ExpenseWithMapper();
     }
 
     //private static String cqlFindAll = "SELECT * FROM expensivest.expenses";

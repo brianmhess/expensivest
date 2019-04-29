@@ -10,7 +10,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.Objects;
 
-@Table(name ="expenses")
+@Table(name ="expenses", keyspace = "expensivest")
 public class ExpenseWithMapper {
     @PartitionKey(0)
     @Column
