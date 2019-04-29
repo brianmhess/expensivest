@@ -3,27 +3,25 @@ package hessian.expensivest.controller;
 import com.google.common.collect.Lists;
 import hessian.expensivest.domain.ExpenseWithMapper;
 import hessian.expensivest.repository.ExpenseWithMapperRepository;
+import hessian.typeparser.AnyParser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.http.MediaType.*;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.function.Function;
 
 @Controller
 public class ExpenseController {
     @Autowired
     private ExpenseWithMapperRepository repository;
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
+    private AnyParser anyParser = AnyParser.defaultParser;
 
     private String header() {
         StringBuilder sb = new StringBuilder();
@@ -179,21 +177,41 @@ public class ExpenseController {
     };
 
     private String footer() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<script src=\"https://code.jquery.com/jquery-3.2.1.slim.min.js\" integrity=\"sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN\" crossorigin=\"anonymous\"></script>\n" +
+        return "<script src=\"https://code.jquery.com/jquery-3.2.1.slim.min.js\" integrity=\"sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN\" crossorigin=\"anonymous\"></script>\n" +
                 "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js\" integrity=\"sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q\" crossorigin=\"anonymous\"></script>\n" +
-                "<script src=\"https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js\" integrity=\"sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl\" crossorigin=\"anonymous\"></script>");
-        sb.append("</body>\n</html>\n");
-
-        return sb.toString();
+                "<script src=\"https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js\" integrity=\"sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl\" crossorigin=\"anonymous\"></script>" +
+                "</body>\n</html>\n";
     }
 
     private String makeTable(List<ExpenseWithMapper> expenses) {
         expenses.sort(new Comparator<ExpenseWithMapper>() {
+            private int compareNulls(Object o1, Object o2) {
+                if (null == o1) {
+                    if (null == o2)
+                        return 0;
+                    else
+                        return -1;
+                }
+                if (null == o2)
+                    return 1;
+                return 2;
+            }
             @Override
             public int compare(ExpenseWithMapper e1, ExpenseWithMapper e2) {
-                if (e1.getUser() == e2.getUser()) {
-                    if (e1.getTrip() == e2.getTrip()) {
+                int ret = compareNulls(e1, e2);
+                if (2 != ret)
+                    return ret;
+                ret = compareNulls(e1.getUser(), e2.getUser());
+                if (2 != ret)
+                    return ret;
+                if (e1.getUser().equals(e2.getUser())) {
+                    ret = compareNulls(e1.getTrip(), e2.getTrip());
+                    if (2 != ret)
+                        return ret;
+                    if (e1.getTrip().equals(e2.getTrip())) {
+                        ret = compareNulls(e1.getExpts(), e2.getExpts());
+                        if (2 != ret)
+                            return ret;
                         if (e1.getExpts() == e2.getExpts())
                             return 0;
                         else
@@ -217,16 +235,19 @@ public class ExpenseController {
         sb.append("    <th>Amount</th>\n");
         sb.append("    <th>Comment</th>\n");
         sb.append("  </tr>\n");
-        for (ExpenseWithMapper e : expenses) {
-            sb.append("  <tr>\n");
-            sb.append("    <td>" + e.getUser() + "</td>\n");
-            sb.append("    <td>" + e.getTrip() + "</td>\n");
-            sb.append("    <td>" + dateFormat.format(e.getExpts()) + "</td>\n");
-            sb.append("    <td>" + e.getCategory() + "</td>\n");
-            sb.append("    <td>" + e.getAmount() + "</td>\n");
-            sb.append("    <td>" + e.getComment() + "</td>\n");
-            sb.append("  </tr>\n");
+        try {
+            for (ExpenseWithMapper e : expenses) {
+                sb.append("  <tr>\n");
+                sb.append("    <td>" + anyParser.format(e.getUser()) + "</td>\n");
+                sb.append("    <td>" + anyParser.format(e.getTrip()) + "</td>\n");
+                sb.append("    <td>" + anyParser.format(e.getExpts()) + "</td>\n");
+                sb.append("    <td>" + anyParser.format(e.getCategory()) + "</td>\n");
+                sb.append("    <td>" + anyParser.format(e.getAmount()) + "</td>\n");
+                sb.append("    <td>" + anyParser.format(e.getComment()) + "</td>\n");
+                sb.append("  </tr>\n");
+            }
         }
+        catch (ParseException p) { }
         sb.append("</table>\n");
         sb.append("</div>\n");
         sb.append("<p>&nbsp\n");
@@ -235,6 +256,36 @@ public class ExpenseController {
     }
 
     private String makeAggTable(List<ExpenseWithMapperRepository.SumCount> aggs) {
+        aggs.sort(new Comparator<ExpenseWithMapperRepository.SumCount>() {
+            private int compareNulls(Object o1, Object o2) {
+                if (null == o1) {
+                    if (null == o2)
+                        return 0;
+                    else
+                        return -1;
+                }
+                if (null == o2)
+                    return 1;
+                return 2;
+            }
+            @Override
+            public int compare(ExpenseWithMapperRepository.SumCount e1, ExpenseWithMapperRepository.SumCount e2) {
+                int ret = compareNulls(e1, e2);
+                if (2 != ret)
+                    return ret;
+                ret = compareNulls(e1.getUser(), e2.getUser());
+                if (2 != ret)
+                    return ret;
+                if (e1.getUser().equals(e2.getUser())) {
+                    ret = compareNulls(e1.getTrip(), e2.getTrip());
+                    if (2 != ret)
+                        return ret;
+                    return e1.getTrip().compareTo(e2.getTrip());
+                }
+                else
+                    return e1.getUser().compareTo(e2.getUser());
+            }
+        });
         StringBuilder sb = new StringBuilder();
         sb.append("<div>\n");
         sb.append("<table border=\"1\" style=\"margin-left:5em;\">\n");
@@ -244,19 +295,30 @@ public class ExpenseController {
         sb.append("    <th>Count</th>\n");
         sb.append("    <th>Sum</th>\n");
         sb.append("  </tr>\n");
-        for (ExpenseWithMapperRepository.SumCount e : aggs) {
-            sb.append("  <tr>\n");
-            sb.append("    <td>" + e.getUser() + "</td>\n");
-            sb.append("    <td>" + e.getTrip() + "</td>\n");
-            sb.append("    <td>" + e.getCount_val() + "</td>\n");
-            sb.append("    <td>" + e.getSum_val() + "</td>\n");
-            sb.append("  </tr>\n");
+        try {
+            for (ExpenseWithMapperRepository.SumCount e : aggs) {
+                sb.append("  <tr>\n");
+                //sb.append("    <td>" + ((null == e.getUser()) ? "null" : anyParser.format(e.getUser())) + "</td>\n");
+                //sb.append("    <td>" + ((null == e.getTrip()) ? "null" : anyParser.format(e.getTrip())) + "</td>\n");
+                //sb.append("    <td>" + ((null == e.getCount_val()) ? "null" : anyParser.format(e.getCount_val())) + "</td>\n");
+                //sb.append("    <td>" + ((null == e.getSum_val()) ? "null" : anyParser.format(e.getSum_val())) + "</td>\n");
+                sb.append("    <td>" + anyParser.format(e.getUser()) + "</td>\n");
+                sb.append("    <td>" + anyParser.format(e.getTrip()) + "</td>\n");
+                sb.append("    <td>" + anyParser.format(e.getCount_val()) + "</td>\n");
+                sb.append("    <td>" + anyParser.format(e.getSum_val()) + "</td>\n");
+                sb.append("  </tr>\n");
+            }
         }
+        catch (ParseException p) { }
         sb.append("</table>\n");
         sb.append("</div>\n");
         sb.append("<p>&nbsp\n");
 
         return sb.toString();
+    }
+
+    private String returnString(String str) {
+        return header() + str + forms() + footer();
     }
 
     @RequestMapping("/")
@@ -274,29 +336,23 @@ public class ExpenseController {
     @RequestMapping("ui/")
     @ResponseBody
     public String index() {
-        return header() + makeTable(repository.findSome(10)) + forms() + footer();
+        return returnString(makeAggTable(repository.sumCountByUserAndTrip()));
     }
 
     @RequestMapping(value = "ui/some", method = RequestMethod.POST)
     @ResponseBody
-    public String some(@RequestParam("some") Integer some) {
-        return header() + makeTable(repository.findSome(some)) + forms() + footer();
+    public String some(@RequestParam("some") String some) throws ParseException{
+        return returnString(makeTable(repository.findSome(anyParser.parse(some, Integer.class))));
     }
 
     @RequestMapping(value = "ui/delete", method = RequestMethod.POST)
     @ResponseBody
     public String some(@RequestParam("user") String user,
                        @RequestParam("trip") String trip,
-                       @RequestParam("expts") String expts) {
-        Date tdate = null;
-        try {
-            tdate = dateFormat.parse(expts);
-        }
-        catch (Exception e){
-            return header() + "<p>Couldn't parse date: expts = " + expts + forms() + footer();
-        }
+                       @RequestParam("expts") String expts)  throws ParseException {
+        Date tdate = anyParser.parse(expts, Date.class);
         repository.delete(user, trip, tdate);
-        return header() + makeTable(repository.findByKeyUserAndKeyTrip(user, trip)) + forms() + footer();
+        return returnString(makeTable(repository.findByKeyUserAndKeyTrip(user, trip)));
     }
 
     @RequestMapping(value = "ui/add", method = RequestMethod.POST)
@@ -306,59 +362,54 @@ public class ExpenseController {
                       @RequestParam("expts") String expts,
                       @RequestParam("amount") String amount,
                       @RequestParam("category") String category,
-                      @RequestParam("comment") String comment) {
-        Date tdate = null;
-        try {
-            tdate = dateFormat.parse(expts);
-        }
-        catch (Exception e){
-            return header() + "<p>Couldn't parse date: expts = " + expts + forms() + footer();
-        }
-        ExpenseWithMapper e = new ExpenseWithMapper(user, trip, tdate, Double.valueOf(amount), category, comment);
+                      @RequestParam("comment") String comment) throws  ParseException {
+        Date tdate = anyParser.parse(expts, Date.class);
+        Double tdouble = anyParser.parse(amount, Double.class);
+        ExpenseWithMapper e = new ExpenseWithMapper(user, trip, tdate, tdouble, category, comment);
         repository.save(user, trip, expts, amount, category, comment);
-        return header() + makeTable(Lists.newArrayList(e)) + forms() + footer();
+        return returnString(makeTable(Lists.newArrayList(e)));
     }
 
     @RequestMapping(value = "ui/user", method = RequestMethod.POST)
     @ResponseBody
-    public String user(@RequestParam("user") String user) {
-        return header() + makeTable(repository.findByKeyUser(user)) + forms() + footer();
+    public String user(@RequestParam("user") String user) throws ParseException {
+        return returnString(makeTable(repository.findByKeyUser(anyParser.parse(user, String.class))));
     }
 
     @RequestMapping(value = "ui/user_trip", method = RequestMethod.POST)
     @ResponseBody
-    public String user_trip(@RequestParam("user") String user, @RequestParam("trip") String trip) {
-        return header() + makeTable(repository.findByKeyUserAndKeyTrip(user, trip)) + forms() + footer();
+    public String user_trip(@RequestParam("user") String user, @RequestParam("trip") String trip) throws ParseException {
+        return returnString(makeTable(repository.findByKeyUserAndKeyTrip(anyParser.parse(user, String.class), anyParser.parse(trip, String.class))));
     }
 
     @RequestMapping(value = "ui/category", method = RequestMethod.POST)
     @ResponseBody
-    public String category(@RequestParam("category") String category) {
-        return header() + makeTable(repository.findByCategory(category)) + forms() + footer();
+    public String category(@RequestParam("category") String category) throws ParseException {
+        return returnString(makeTable(repository.findByCategory(anyParser.parse(category, String.class))));
     }
 
     @RequestMapping(value = "ui/amount_gt", method = RequestMethod.POST)
     @ResponseBody
-    public String amount_gt(@RequestParam("amount") String amount) {
-        return header() + makeTable(repository.findByAmountGreaterThan(Double.valueOf(amount))) + forms() + footer();
+    public String amount_gt(@RequestParam("amount") String amount) throws ParseException {
+        return returnString(makeTable(repository.findByAmountGreaterThan(anyParser.parse(amount, Double.class))));
     }
 
     @RequestMapping(value = "ui/agg_global", method = RequestMethod.POST)
     @ResponseBody
     public String agg_global() {
-        return header() + makeAggTable(Lists.newArrayList(repository.sumCountGlobal())) + forms() + footer();
+        return returnString(makeAggTable(Lists.newArrayList(repository.sumCountGlobal())));
     }
 
     @RequestMapping(value = "ui/agg_user", method = RequestMethod.POST)
     @ResponseBody
     public String agg_user() {
-        return header() + makeAggTable(repository.sumCountByUser()) + forms() + footer();
+        return returnString(makeAggTable(repository.sumCountByUser()));
     }
 
     @RequestMapping(value = "ui/agg_user_trip", method = RequestMethod.POST)
     @ResponseBody
     public String agg_user_trip() {
-        return header() + makeAggTable(repository.sumCountByUserAndTrip()) + forms() + footer();
+        return returnString(makeAggTable(repository.sumCountByUserAndTrip()));
     }
 
 }
