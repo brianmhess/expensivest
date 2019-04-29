@@ -1,4 +1,4 @@
-package hessian.expensivest.domain;
+package hessian.expensivest.spring;
 
 import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
@@ -17,11 +17,20 @@ public class Expense implements Serializable{
 
     @Column("comment") private String comment;
 
+    public Expense() { }
+
     public Expense(String category, Double amount, String comment, ExpensePrimaryKey key) {
         this.category = category;
         this.amount = amount;
         this.comment = comment;
         this.key = key;
+    }
+
+    public Expense(Expense expense) {
+        this.category = expense.getCategory();
+        this.amount = expense.getAmount();
+        this.comment = expense.getComment();
+        this.key = expense.getKey();
     }
 
     @Override
@@ -66,3 +75,4 @@ public class Expense implements Serializable{
         this.key = key;
     }
 }
+

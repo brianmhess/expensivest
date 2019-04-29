@@ -1,18 +1,15 @@
-package hessian.expensivest.repository;
+package hessian.expensivest.mapper;
 
 import com.datastax.driver.core.*;
 import com.datastax.driver.core.querybuilder.BuiltStatement;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.mapping.MappingManager;
-import com.sun.javafx.scene.control.skin.VirtualFlow;
-import hessian.expensivest.domain.ExpenseWithMapper;
 import com.datastax.driver.mapping.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,38 +17,43 @@ import java.util.stream.Collectors;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.*;
 
 @Repository
-public class ExpenseWithMapperRepository {
+public class ExpenseRepositoryMapper {
     private MappingManager mappingManager;
-    private Mapper<ExpenseWithMapper> mapper;
+    private Mapper<Expense> mapper;
     private Session session;
 
     @Autowired
-    public ExpenseWithMapperRepository(MappingManager mappingManager) {
+    public ExpenseRepositoryMapper(MappingManager mappingManager) {
         this.mappingManager = mappingManager;
     }
 
     @PostConstruct
     private void init() {
-        this.mapper = mappingManager.mapper(ExpenseWithMapper.class);
+        this.mapper = mappingManager.mapper(Expense.class);
         this.mapper.setDefaultSaveOptions(Mapper.Option.saveNullFields(false));
         this.session = mappingManager.getSession();
 
-        psFindAll = session.prepare(builtFindAll); //session.prepare(cqlFindAll);
-        psFindSome = session.prepare(builtFindSome); // session.prepare(cqlFindSome);
-        psFindByKeyUser = session.prepare(builtFindByKeyUser); // session.prepare(cqlFindByKeyUser);
-        psFindByKeyUserAndKeyTrip = session.prepare(builtFindByKeyUserAndKeyTrip); // session.prepare(cqlFindByKeyUserAndKeyTrip);
-        psFindByCategory = session.prepare(builtFindByCategory); // session.prepare(cqlFindByCategory);
-        psFindByAmountGreaterThan = session.prepare(builtFindByAmountGreaterThan); // session.prepare(cqlFindByAmountGreaterThan);
+        psFindAll = session.prepare(builtFindAll);
+        psFindSome = session.prepare(builtFindSome);
+        psFindByKeyUser = session.prepare(builtFindByKeyUser);
+        psFindByKeyUserAndKeyTrip = session.prepare(builtFindByKeyUserAndKeyTrip);
+        psFindByCategory = session.prepare(builtFindByCategory);
+        psFindByAmountGreaterThan = session.prepare(builtFindByAmountGreaterThan);
 
-        psSumCountGlobal = session.prepare(builtSumCountGlobal); // session.prepare(cqlSumCountGlobal);
-        psSumCountByUser = session.prepare(builtSumCountByUser); // session.prepare(cqlSumCountByUser);
-        psSumCountByUserAndTrip = session.prepare(builtSumCountByUserAndTrip); // session.prepare(cqlSumCountByUserAndTrip);
+        psSumCountGlobal = session.prepare(builtSumCountGlobal);
+        psSumCountByUser = session.prepare(builtSumCountByUser);
+        psSumCountByUserAndTrip = session.prepare(builtSumCountByUserAndTrip);
+
+        //session.prepare("SELECT * FROM expensivest.expenses WHERE category LIKE :category");
+        psFindByCategoryLike = session.prepare(builtFindByCategoryLike);
+        //session.prepare("SELECT * FROM expensivest.expenses WHERE category LIKE :category");
+        psFindByCategoryStartingWith = session.prepare(builtFindByCategoryStartingWith);
     }
 
     // Save
-    public ExpenseWithMapper save(ExpenseWithMapper expenseWithMapper) {
-        mapper.save(expenseWithMapper);
-        return expenseWithMapper;
+    public Expense save(Expense expense) {
+        mapper.save(expense);
+        return expense;
     }
 
     public String save(String user, String trip, String expts, String amount, String category, String comment) {
@@ -65,7 +67,7 @@ public class ExpenseWithMapperRepository {
             retval = "<p>Couldn't parse date: expts = " + expts;
             return retval;
         }
-        ExpenseWithMapper e = new ExpenseWithMapper(user, trip, tdate, Double.valueOf(amount), category, comment);
+        Expense e = new Expense(user, trip, tdate, Double.valueOf(amount), category, comment);
         mapper.save(e);
         retval = "";
         return retval;
@@ -76,75 +78,77 @@ public class ExpenseWithMapperRepository {
         mapper.delete(user, trip, expts);
     }
 
-    //private static String cqlFindAll = "SELECT * FROM expensivest.expenses";
+    // Find
     private static BuiltStatement builtFindAll = QueryBuilder.select().all().from("expensivest", "expenses");
     private PreparedStatement psFindAll;
-    public List<ExpenseWithMapper> findAll() {
+    public List<Expense> findAll() {
         BoundStatement bs = psFindAll.bind();
         return mapper.map(session.execute(bs)).all();
     }
 
-    //private static String cqlFindSome = "SELECT * FROM expensivest.expenses LIMIT ?";
-    //private static String cqlFindSome = "SELECT * FROM expensivest.expenses LIMIT :limit";
     private BuiltStatement builtFindSome = QueryBuilder.select().all().from("expensivest", "expenses").limit(bindMarker("lmt"));
     private PreparedStatement psFindSome;
-    public List<ExpenseWithMapper> findSome(Integer some) {
+    public List<Expense> findSome(Integer some) {
         BoundStatement bs = psFindSome.bind();
-        //bs.set(0, some, Integer.class);
         bs.set("lmt", some, Integer.class);
         return mapper.map(session.execute(bs)).all();
     }
 
-    //private static String cqlFindByKeyUser = "SELECT * FROM expensivest.expenses WHERE user = ?";
-    //private static String cqlFindByKeyUser = "SELECT * FROM expensivest.expenses WHERE user = :user";
     private static BuiltStatement builtFindByKeyUser = QueryBuilder.select().all().from("expensivest", "expenses").where(eq("user", bindMarker("user")));
     private PreparedStatement psFindByKeyUser;
-    public List<ExpenseWithMapper> findByKeyUser(String user) {
+    public List<Expense> findByKeyUser(String user) {
         BoundStatement bs = psFindByKeyUser.bind();
         bs.set("user", user, String.class);
-        //bs.set(0, user, String.class);
         return mapper.map(session.execute(bs)).all();
     }
 
-    //private static String cqlFindByKeyUserAndKeyTrip = "SELECT * FROM expensivest.expenses WHERE user = ? AND trip = ?";
-    //private static String cqlFindByKeyUserAndKeyTrip = "SELECT * FROM expensivest.expenses WHERE user = :user AND trip = :trip";
     private static BuiltStatement builtFindByKeyUserAndKeyTrip = QueryBuilder.select().all().from("expensivest", "expenses")
             .where(eq("user", bindMarker("user"))).and(eq("trip", bindMarker("trip")));
     private PreparedStatement psFindByKeyUserAndKeyTrip;
-    public List<ExpenseWithMapper> findByKeyUserAndKeyTrip(String user, String trip) {
+    public List<Expense> findByKeyUserAndKeyTrip(String user, String trip) {
         BoundStatement bs = psFindByKeyUserAndKeyTrip.bind();
         bs.set("user", user, String.class);
         bs.set("trip", trip, String.class);
-        //bs.set(0, user, String.class);
-        //bs.set(1, trip, String.class);
         return mapper.map(session.execute(bs)).all();
     }
 
-    //private static String cqlFindByCategory = "SELECT * FROM expensivest.expenses WHERE category = ? ALLOW FILTERING";
-    //private static String cqlFindByCategory = "SELECT * FROM expensivest.expenses WHERE category = :category ALLOW FILTERING";
     private static BuiltStatement builtFindByCategory = QueryBuilder.select().all().from("expensivest", "expenses")
-            .where(eq("category", bindMarker("category"))).allowFiltering();
+            .where(eq("category", bindMarker("category")));
     private PreparedStatement psFindByCategory;
-    public List<ExpenseWithMapper> findByCategory(String category) {
+    public List<Expense> findByCategory(String category) {
         BoundStatement bs = psFindByCategory.bind();
         bs.set("category", category, String.class);
-        //bs.set(0, category, String.class);
         return mapper.map(session.execute(bs)).all();
     }
 
-    //private static String cqlFindByAmountGreaterThan = "SELECT * FROM expensivest.expenses WHERE amount > ? ALLOW FILTERING";
-    //private static String cqlFindByAmountGreaterThan = "SELECT * FROM expensivest.expenses WHERE amount > :amount ALLOW FILTERING";
     private static BuiltStatement builtFindByAmountGreaterThan = QueryBuilder.select().all().from("expensivest", "expenses")
-            .where(gt("amount", bindMarker("amount"))).allowFiltering();
+            .where(gt("amount", bindMarker("amount")));
     private PreparedStatement psFindByAmountGreaterThan;
-    public List<ExpenseWithMapper> findByAmountGreaterThan(Double amount) {
+    public List<Expense> findByAmountGreaterThan(Double amount) {
         BoundStatement bs = psFindByAmountGreaterThan.bind();
         bs.set("amount", amount, Double.class);
-        //bs.set(0, amount, Double.class);
         return mapper.map(session.execute(bs)).all();
     }
 
-    //private static String cqlSumCountGlobal = "SELECT SUM(amount) AS sum_val, COUNT(amount) AS count_val FROM expensivest.expenses";
+    //session.prepare("SELECT * FROM expensivest.expenses WHERE category LIKE :category");
+    private static BuiltStatement builtFindByCategoryLike = QueryBuilder.select().all().from("expensivest", "expenses")
+            .where(like("category", bindMarker("category")));
+    private PreparedStatement psFindByCategoryLike;
+    public List<Expense> findByCategoryLike(String category) {
+        BoundStatement bs = psFindByCategoryLike.bind();
+        bs.set("category", category, String.class);
+        return mapper.map(session.execute(bs)).all();
+    }
+
+    private static BuiltStatement builtFindByCategoryStartingWith = QueryBuilder.select().all().from("expensivest", "expenses")
+            .where(like("category", bindMarker("category")));
+    private PreparedStatement psFindByCategoryStartingWith;
+    public List<Expense> findByCategoryStartingWith(String category) {
+        BoundStatement bs = psFindByCategoryStartingWith.bind();
+        bs.set("category", category+"%", String.class);
+        return mapper.map(session.execute(bs)).all();
+    }
+
     private static BuiltStatement builtSumCountGlobal = QueryBuilder.select().sum(column("amount")).as("sum_val")
             .count(column("amount")).as("count_val")
             .from("expensivest", "expenses");
@@ -153,7 +157,6 @@ public class ExpenseWithMapperRepository {
         return new SumCount(session.execute(psSumCountGlobal.bind()).one());
     }
 
-    //private static String cqlSumCountByUser = "SELECT user, SUM(amount) AS sum_val, COUNT(amount) AS count_val FROM expensivest.expenses GROUP BY user";
     private static BuiltStatement builtSumCountByUser = QueryBuilder.select().column("user")
             .sum(column("amount")).as("sum_val")
             .count(column("amount")).as("count_val")
@@ -164,7 +167,6 @@ public class ExpenseWithMapperRepository {
         return session.execute(psSumCountByUser.bind()).all().stream().map(x -> new SumCount(x)).collect(Collectors.toList());
     }
 
-    //private static String cqlSumCountByUserAndTrip = "SELECT user, trip, SUM(amount) AS sum_val, COUNT(amount) AS count_val FROM expensivest.expenses GROUP BY user, trip";
     private static BuiltStatement builtSumCountByUserAndTrip = QueryBuilder.select().column("user").column("trip")
             .sum(column("amount")).as("sum_val")
             .count(column("amount")).as("count_val")
