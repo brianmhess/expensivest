@@ -54,7 +54,7 @@ Navigate to `http://localhost:8222/api` to see the list of endpoints
 ```
 Endpoint                                  | Return
 ------------------------------------------|-----------------------------------------------------
-hello                                     | Prints Hello World
+api/hello                                 | Prints Hello World
 api/user?user={user}                      | Prints all expenses for "user"
 api/user_trip?user={user}&trip={trip}     | Prints all expenses for "user" for "trip"
 api/category?category={category}          | Prints all expenses for "category"
@@ -83,7 +83,7 @@ Navigate to `http://localhost:8222/dse` to see the list of endpoints
 ```
 Endpoint                                  | Return
 ------------------------------------------|-----------------------------------------------------
-hello                                     | Prints Hello World
+dse/hello                                 | Prints Hello World
 dse/user?user={user}                      | Prints all expenses for "user"
 dse/user_trip?user={user}&trip={trip}     | Prints all expenses for "user" for "trip"
 dse/category?category={category}          | Prints all expenses for "category"
