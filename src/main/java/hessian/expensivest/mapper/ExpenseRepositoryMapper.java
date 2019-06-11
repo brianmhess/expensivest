@@ -79,14 +79,14 @@ public class ExpenseRepositoryMapper {
     }
 
     // Find
-    private static BuiltStatement builtFindAll = QueryBuilder.select().all().from("expensivest", "expenses");
+    private static BuiltStatement builtFindAll = QueryBuilder.select().all().from("corp_finance", "expenses");
     private PreparedStatement psFindAll;
     public List<Expense> findAll() {
         BoundStatement bs = psFindAll.bind();
         return mapper.map(session.execute(bs)).all();
     }
 
-    private BuiltStatement builtFindSome = QueryBuilder.select().all().from("expensivest", "expenses").limit(bindMarker("lmt"));
+    private BuiltStatement builtFindSome = QueryBuilder.select().all().from("corp_finance", "expenses").limit(bindMarker("lmt"));
     private PreparedStatement psFindSome;
     public List<Expense> findSome(Integer some) {
         BoundStatement bs = psFindSome.bind();
@@ -94,7 +94,7 @@ public class ExpenseRepositoryMapper {
         return mapper.map(session.execute(bs)).all();
     }
 
-    private static BuiltStatement builtFindByKeyUser = QueryBuilder.select().all().from("expensivest", "expenses").where(eq("user", bindMarker("user")));
+    private static BuiltStatement builtFindByKeyUser = QueryBuilder.select().all().from("corp_finance", "expenses").where(eq("user", bindMarker("user")));
     private PreparedStatement psFindByKeyUser;
     public List<Expense> findByKeyUser(String user) {
         BoundStatement bs = psFindByKeyUser.bind();
@@ -102,7 +102,7 @@ public class ExpenseRepositoryMapper {
         return mapper.map(session.execute(bs)).all();
     }
 
-    private static BuiltStatement builtFindByKeyUserAndKeyTrip = QueryBuilder.select().all().from("expensivest", "expenses")
+    private static BuiltStatement builtFindByKeyUserAndKeyTrip = QueryBuilder.select().all().from("corp_finance", "expenses")
             .where(eq("user", bindMarker("user"))).and(eq("trip", bindMarker("trip")));
     private PreparedStatement psFindByKeyUserAndKeyTrip;
     public List<Expense> findByKeyUserAndKeyTrip(String user, String trip) {
@@ -112,7 +112,7 @@ public class ExpenseRepositoryMapper {
         return mapper.map(session.execute(bs)).all();
     }
 
-    private static BuiltStatement builtFindByCategory = QueryBuilder.select().all().from("expensivest", "expenses")
+    private static BuiltStatement builtFindByCategory = QueryBuilder.select().all().from("corp_finance", "expenses")
             .where(eq("category", bindMarker("category")));
     private PreparedStatement psFindByCategory;
     public List<Expense> findByCategory(String category) {
@@ -121,7 +121,7 @@ public class ExpenseRepositoryMapper {
         return mapper.map(session.execute(bs)).all();
     }
 
-    private static BuiltStatement builtFindByAmountGreaterThan = QueryBuilder.select().all().from("expensivest", "expenses")
+    private static BuiltStatement builtFindByAmountGreaterThan = QueryBuilder.select().all().from("corp_finance", "expenses")
             .where(gt("amount", bindMarker("amount")));
     private PreparedStatement psFindByAmountGreaterThan;
     public List<Expense> findByAmountGreaterThan(Double amount) {
@@ -131,7 +131,7 @@ public class ExpenseRepositoryMapper {
     }
 
     //session.prepare("SELECT * FROM expensivest.expenses WHERE category LIKE :category");
-    private static BuiltStatement builtFindByCategoryLike = QueryBuilder.select().all().from("expensivest", "expenses")
+    private static BuiltStatement builtFindByCategoryLike = QueryBuilder.select().all().from("corp_finance", "expenses")
             .where(like("category", bindMarker("category")));
     private PreparedStatement psFindByCategoryLike;
     public List<Expense> findByCategoryLike(String category) {
@@ -140,7 +140,7 @@ public class ExpenseRepositoryMapper {
         return mapper.map(session.execute(bs)).all();
     }
 
-    private static BuiltStatement builtFindByCategoryStartingWith = QueryBuilder.select().all().from("expensivest", "expenses")
+    private static BuiltStatement builtFindByCategoryStartingWith = QueryBuilder.select().all().from("corp_finance", "expenses")
             .where(like("category", bindMarker("category")));
     private PreparedStatement psFindByCategoryStartingWith;
     public List<Expense> findByCategoryStartingWith(String category) {
@@ -151,7 +151,7 @@ public class ExpenseRepositoryMapper {
 
     private static BuiltStatement builtSumCountGlobal = QueryBuilder.select().sum(column("amount")).as("sum_val")
             .count(column("amount")).as("count_val")
-            .from("expensivest", "expenses");
+            .from("corp_finance", "expenses");
     private PreparedStatement psSumCountGlobal;
     public SumCount sumCountGlobal() {
         return new SumCount(session.execute(psSumCountGlobal.bind()).one());
@@ -160,7 +160,7 @@ public class ExpenseRepositoryMapper {
     private static BuiltStatement builtSumCountByUser = QueryBuilder.select().column("user")
             .sum(column("amount")).as("sum_val")
             .count(column("amount")).as("count_val")
-            .from("expensivest", "expenses")
+            .from("corp_finance", "expenses")
             .groupBy(column("user"));
     private PreparedStatement psSumCountByUser;
     public List<SumCount> sumCountByUser() {
@@ -170,7 +170,7 @@ public class ExpenseRepositoryMapper {
     private static BuiltStatement builtSumCountByUserAndTrip = QueryBuilder.select().column("user").column("trip")
             .sum(column("amount")).as("sum_val")
             .count(column("amount")).as("count_val")
-            .from("expensivest", "expenses")
+            .from("corp_finance", "expenses")
             .groupBy(column("user"), column("trip"));
     private PreparedStatement psSumCountByUserAndTrip;
     public List<SumCount> sumCountByUserAndTrip() {

@@ -14,7 +14,7 @@ public class ExpensivestConfiguration extends AbstractCassandraConfiguration {
     private int port = 9042;
 
     @Value("${dse.keyspace}")
-    private String keyspace = "expensivest";
+    private String keyspace = "corp_finance";
 
     public String getContactPoints() {
         return contactPoints;
