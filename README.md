@@ -42,6 +42,12 @@ CREATE TABLE IF NOT EXISTS expensivest.expenses(
 
 CREATE SEARCH INDEX IF NOT EXISTS ON expensivest.expenses;
 ```
+### Build 
+
+You can configure application.properties located under src/java/resources
+
+mvn clean package
+mvn spring-boot:run
 
 ### Webpage
 Navigate to `http://localhost:8222/` to see a "Hello World" message.

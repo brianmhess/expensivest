@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Date;
 import java.util.Objects;
 
-@Table(name ="expenses", keyspace = "expensivest")
+@Table(name ="expenses", keyspace = "corp_finance")
 public class Expense {
     @PartitionKey(0)
     @Column
