@@ -1,8 +1,7 @@
 package hessian.expensivest.web;
 
 import com.google.common.collect.Lists;
-import hessian.expensivest.mapper.Expense;
-import hessian.expensivest.mapper.ExpenseRepositoryMapper;
+import hessian.expensivest.mapper.*;
 import hessian.typeparser.AnyParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,14 +11,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.text.ParseException;
+import java.time.Instant;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 
 @Controller
 public class ExpenseController {
     @Autowired
-    private ExpenseRepositoryMapper repository;
+    private ExpenseDao repository;
     private AnyParser anyParser = AnyParser.defaultParser;
 
     private String header() {
@@ -274,8 +273,8 @@ public class ExpenseController {
         return sb.toString();
     }
 
-    private String makeAggTable(List<ExpenseRepositoryMapper.SumCount> aggs) {
-        aggs.sort(new Comparator<ExpenseRepositoryMapper.SumCount>() {
+    private String makeAggTable(List<ExpenseSumCount> aggs) {
+        aggs.sort(new Comparator<ExpenseSumCount>() {
             private int compareNulls(Object o1, Object o2) {
                 if (null == o1) {
                     if (null == o2)
@@ -288,7 +287,7 @@ public class ExpenseController {
                 return 2;
             }
             @Override
-            public int compare(ExpenseRepositoryMapper.SumCount e1, ExpenseRepositoryMapper.SumCount e2) {
+            public int compare(ExpenseSumCount e1, ExpenseSumCount e2) {
                 int ret = compareNulls(e1, e2);
                 if (2 != ret)
                     return ret;
@@ -315,7 +314,7 @@ public class ExpenseController {
         sb.append("    <th>Sum</th>\n");
         sb.append("  </tr>\n");
         try {
-            for (ExpenseRepositoryMapper.SumCount e : aggs) {
+            for (ExpenseSumCount e : aggs) {
                 sb.append("  <tr>\n");
                 //sb.append("    <td>" + ((null == e.getUser()) ? "null" : anyParser.format(e.getUser())) + "</td>\n");
                 //sb.append("    <td>" + ((null == e.getTrip()) ? "null" : anyParser.format(e.getTrip())) + "</td>\n");
@@ -358,13 +357,13 @@ public class ExpenseController {
     @RequestMapping("web")
     @ResponseBody
     public String index() {
-        return returnString("<h4>Sum/Count by User and Trip</h4>" + makeAggTable(repository.sumCountByUserAndTrip()));
+        return returnString("<h4>Sum/Count by User and Trip</h4>" + makeAggTable(repository.sumCountByUserAndTrip().all()));
     }
 
     @RequestMapping(value = "web/some", method = RequestMethod.POST)
     @ResponseBody
     public String some(@RequestParam("some") String some) throws ParseException{
-        return returnString("<h4>" + some + " records</h4>" + makeTable(repository.findSome(anyParser.parse(some, Integer.class))));
+        return returnString("<h4>" + some + " records</h4>" + makeTable(repository.findSome(anyParser.parse(some, Integer.class)).all()));
     }
 
     @RequestMapping(value = "web/delete", method = RequestMethod.POST)
@@ -372,9 +371,9 @@ public class ExpenseController {
     public String delete(@RequestParam("user") String user,
                        @RequestParam("trip") String trip,
                        @RequestParam("expts") String expts)  throws ParseException {
-        Date tdate = anyParser.parse(expts, Date.class);
+        Instant tdate = anyParser.parse(expts, Instant.class);
         repository.delete(user, trip, tdate);
-        return returnString(makeTable(repository.findByKeyUserAndKeyTrip(user, trip)));
+        return returnString(makeTable(repository.findByKeyUserAndKeyTrip(user, trip).all()));
     }
 
     @RequestMapping(value = "web/add", method = RequestMethod.POST)
@@ -385,47 +384,47 @@ public class ExpenseController {
                       @RequestParam("amount") String amount,
                       @RequestParam("category") String category,
                       @RequestParam("comment") String comment) throws  ParseException {
-        Date tdate = anyParser.parse(expts, Date.class);
+        Instant tdate = anyParser.parse(expts, Instant.class);
         Double tdouble = anyParser.parse(amount, Double.class);
         Expense e = new Expense(user, trip, tdate, tdouble, category, comment);
-        repository.save(user, trip, expts, amount, category, comment);
+        repository.save(e);
         return returnString("<h4>Created new record</h4>" + makeTable(Lists.newArrayList(e)));
     }
 
     @RequestMapping(value = "web/user", method = RequestMethod.POST)
     @ResponseBody
     public String user(@RequestParam("user") String user) throws ParseException {
-        return returnString("<h4>Records for " + user + "</h4>" + makeTable(repository.findByKeyUser(anyParser.parse(user, String.class))));
+        return returnString("<h4>Records for " + user + "</h4>" + makeTable(repository.findByKeyUser(anyParser.parse(user, String.class)).all()));
     }
 
     @RequestMapping(value = "web/user_trip", method = RequestMethod.POST)
     @ResponseBody
     public String user_trip(@RequestParam("user") String user, @RequestParam("trip") String trip) throws ParseException {
-        return returnString("<h4>Records for " + user + " and trip " + trip + "</h4>" + makeTable(repository.findByKeyUserAndKeyTrip(anyParser.parse(user, String.class), anyParser.parse(trip, String.class))));
+        return returnString("<h4>Records for " + user + " and trip " + trip + "</h4>" + makeTable(repository.findByKeyUserAndKeyTrip(anyParser.parse(user, String.class), anyParser.parse(trip, String.class)).all()));
     }
 
     @RequestMapping(value = "web/category", method = RequestMethod.POST)
     @ResponseBody
     public String category(@RequestParam("category") String category) throws ParseException {
-        return returnString("<h4>Records for category " + category + "</h4>" + makeTable(repository.findByCategory(anyParser.parse(category, String.class))));
+        return returnString("<h4>Records for category " + category + "</h4>" + makeTable(repository.findByCategory(anyParser.parse(category, String.class)).all()));
     }
 
     @RequestMapping(value = "web/category/like", method = RequestMethod.POST)
     @ResponseBody
     public String categoryLike(@RequestParam String category) throws ParseException {
-        return returnString("<h4>Records for category like " + category + "</h4>" + makeTable(repository.findByCategoryLike(anyParser.parse(category, String.class))));
+        return returnString("<h4>Records for category like " + category + "</h4>" + makeTable(repository.findByCategoryLike(anyParser.parse(category, String.class)).all()));
     }
 
     @RequestMapping(value = "web/category/starting", method = RequestMethod.POST)
     @ResponseBody
     public String categoryStarts(@RequestParam String category) throws ParseException {
-        return returnString("<h4>Records for category starting " + category + "</h4>" + makeTable(repository.findByCategoryStartingWith(anyParser.parse(category, String.class))));
+        return returnString("<h4>Records for category starting " + category + "</h4>" + makeTable(repository.findByCategoryStartingWith(anyParser.parse(category, String.class)).all()));
     }
 
     @RequestMapping(value = "web/amount/gt", method = RequestMethod.POST)
     @ResponseBody
     public String amount_gt(@RequestParam("amount") String amount) throws ParseException {
-        return returnString("<h4>Records with amount greater than " + amount + "</h4>" + makeTable(repository.findByAmountGreaterThan(anyParser.parse(amount, Double.class))));
+        return returnString("<h4>Records with amount greater than " + amount + "</h4>" + makeTable(repository.findByAmountGreaterThan(anyParser.parse(amount, Double.class)).all()));
     }
 
     @RequestMapping(value = "web/sum_count/global", method = RequestMethod.POST)
@@ -437,13 +436,13 @@ public class ExpenseController {
     @RequestMapping(value = "web/sum_count/user", method = RequestMethod.POST)
     @ResponseBody
     public String agg_user() {
-        return returnString("<h4>Statistics by User</h4>" + makeAggTable(repository.sumCountByUser()));
+        return returnString("<h4>Statistics by User</h4>" + makeAggTable(repository.sumCountByUser().all()));
     }
 
     @RequestMapping(value = "web/sum_count/user_and_trip", method = RequestMethod.POST)
     @ResponseBody
     public String agg_user_trip() {
-        return returnString("<h4>Statistics by User and Trip</h4>" + makeAggTable(repository.sumCountByUserAndTrip()));
+        return returnString("<h4>Statistics by User and Trip</h4>" + makeAggTable(repository.sumCountByUserAndTrip().all()));
     }
 
 }

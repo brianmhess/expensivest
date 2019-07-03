@@ -14,13 +14,13 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.0.6.RELEASE</version>
+		<version>2.1.4.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
 	<properties>
 		<!-- DSE -->
-		<dse-java-driver.version>1.7.0</dse-java-driver.version>
+		<dse-java-driver.version>2.1.0</dse-java-driver.version>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -28,19 +28,9 @@
 		<spring-data.version>2.0.7.RELEASE</spring-data.version>
 	</properties>
 
-	<!--
 	<repositories>
 		<repository>
-			<id>data-local</id>
-			<name>data</name>
-			<url>file://${project.basedir}/repo</url>
-		</repository>
-	</repositories>
-	-->
-
-	<repositories>
-		<repository>
-			<id>data-local</id>
+			<id>1-data-local</id>
 			<name>datat2</name>
 			<url>file://${project.basedir}/repo</url>
 		</repository>
@@ -55,12 +45,17 @@
 		</dependency>
 		<dependency>
 			<groupId>com.datastax.dse</groupId>
-			<artifactId>dse-java-driver-mapping</artifactId>
+			<artifactId>dse-java-driver-query-builder</artifactId>
 			<version>${dse-java-driver.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.datastax.dse</groupId>
-			<artifactId>dse-java-driver-extras</artifactId>
+			<artifactId>dse-java-driver-mapper-processor</artifactId>
+			<version>${dse-java-driver.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.datastax.dse</groupId>
+			<artifactId>dse-java-driver-mapper-runtime</artifactId>
 			<version>${dse-java-driver.version}</version>
 		</dependency>
 

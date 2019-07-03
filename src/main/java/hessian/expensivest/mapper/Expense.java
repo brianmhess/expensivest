@@ -1,41 +1,35 @@
 package hessian.expensivest.mapper;
 
-import com.datastax.driver.mapping.annotations.ClusteringColumn;
-import com.datastax.driver.mapping.annotations.Column;
-import com.datastax.driver.mapping.annotations.PartitionKey;
-import com.datastax.driver.mapping.annotations.Table;
+import com.datastax.oss.driver.api.mapper.annotations.ClusteringColumn;
+import com.datastax.oss.driver.api.mapper.annotations.Entity;
+import com.datastax.oss.driver.api.mapper.annotations.PartitionKey;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import hessian.typeparser.AnyParser;
 
-import java.util.Date;
+import java.text.ParseException;
+import java.time.Instant;
 import java.util.Objects;
 
-@Table(name ="expenses", keyspace = "expensivest")
+@Entity
 public class Expense {
-    @PartitionKey(0)
-    @Column
+    @PartitionKey
     private String user;
 
-    @PartitionKey(1)
-    @Column
+    @ClusteringColumn(1)
     private String trip;
 
-    @ClusteringColumn(0)
-    @Column
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    private Date expts;
+    @ClusteringColumn(2)
+    private Instant expts;
 
-    @Column
     private Double amount;
 
-    @Column
     private String category;
 
-    @Column
     private String comment;
 
     public Expense() { }
 
-    public Expense(String user, String trip, Date expts, Double amount, String category, String comment) {
+    public Expense(String user, String trip, Instant expts, Double amount, String category, String comment) {
         this.user = user;
         this.trip = trip;
         this.expts = expts;
@@ -46,14 +40,19 @@ public class Expense {
 
     @Override
     public String toString() {
-        return "Expense{" +
-                "user='" + user + '\'' +
-                ", trip='" + trip + '\'' +
-                ", expts=" + expts +
-                ", amount=" + amount +
-                ", category='" + category + '\'' +
-                ", comment='" + comment + '\'' +
-                '}';
+        try {
+            return "Expense{" +
+                    "user='" + user + '\'' +
+                    ", trip='" + trip + '\'' +
+                    ", expts=" + AnyParser.defaultParser.format(expts, Instant.class) +
+                    ", amount=" + amount +
+                    ", category='" + category + '\'' +
+                    ", comment='" + comment + '\'' +
+                    '}';
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
     public String getUser() {
@@ -72,11 +71,11 @@ public class Expense {
         this.trip = trip;
     }
 
-    public Date getExpts() {
+    public Instant getExpts() {
         return expts;
     }
 
-    public void setExpts(Date expts) {
+    public void setExpts(Instant expts) {
         this.expts = expts;
     }
 
