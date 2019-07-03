@@ -24,7 +24,7 @@ public class ExpenseDaoQueryProvider {
 
     public PagingIterable<Expense> findByCategoryStartingWith(String category) {
         BoundStatement bs = preparedStatement.bind();
-        bs.set("category", category+"%", String.class);
+        bs = bs.set("category", category+"%", String.class);
         return session.execute(bs).map(expenseHelper::get);
     }
 }
