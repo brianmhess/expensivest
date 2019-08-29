@@ -265,7 +265,9 @@ public class ExpenseController {
                 sb.append("  </tr>\n");
             }
         }
-        catch (ParseException p) { }
+        catch (ParseException p) {
+            p.printStackTrace();
+        }
         sb.append("</table>\n");
         sb.append("</div>\n");
         sb.append("<p>&nbsp\n");

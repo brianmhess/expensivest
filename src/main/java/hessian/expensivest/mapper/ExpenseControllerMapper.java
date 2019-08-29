@@ -1,7 +1,5 @@
 package hessian.expensivest.mapper;
 
-import com.datastax.dse.driver.api.core.DseSession;
-import com.datastax.oss.driver.api.core.CqlSession;
 import hessian.typeparser.AnyParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
