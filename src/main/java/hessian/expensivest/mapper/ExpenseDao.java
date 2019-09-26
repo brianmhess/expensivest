@@ -44,7 +44,7 @@ public interface ExpenseDao {
     public MappedReactiveResultSet<Expense> findByCategoryLike(String category);
 
     @QueryProvider(providerClass = ExpenseDaoQueryProvider.class, entityHelpers = Expense.class)
-    public Publisher<Expense> findByCategoryStartingWith(String category);
+    public MappedReactiveResultSet<Expense> findByCategoryStartingWith(String category);
 
 
     // Sums and Counts
