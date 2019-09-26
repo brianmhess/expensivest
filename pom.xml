@@ -28,6 +28,19 @@
 		<spring-data.version>2.0.7.RELEASE</spring-data.version>
 	</properties>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>io.projectreactor</groupId>
+				<artifactId>reactor-bom</artifactId>
+				<version>Bismuth-RELEASE</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+
 	<repositories>
 		<repository>
 			<id>1-data-local</id>
@@ -82,6 +95,12 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Reactor -->
+		<dependency>
+			<groupId>io.projectreactor</groupId>
+			<artifactId>reactor-test</artifactId>
+			<scope>test</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>hessian</groupId>
