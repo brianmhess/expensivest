@@ -1,7 +1,8 @@
 package hessian.expensivest.mapper;
 
 import com.datastax.dse.driver.api.core.DseSession;
-import com.datastax.oss.driver.api.core.PagingIterable;
+import com.datastax.dse.driver.api.mapper.reactive.MappedReactiveResultSet;
+import com.datastax.dse.driver.internal.mapper.reactive.DefaultMappedReactiveResultSet;
 import com.datastax.oss.driver.api.core.cql.BoundStatement;
 import com.datastax.oss.driver.api.core.cql.PreparedStatement;
 import com.datastax.oss.driver.api.mapper.MapperContext;
@@ -22,9 +23,9 @@ public class ExpenseDaoQueryProvider {
         this.preparedStatement = this.session.prepare(QueryBuilder.selectFrom("expensivest", "expenses").all().whereColumn("category").like(bindMarker("category")).build());
     }
 
-    public PagingIterable<Expense> findByCategoryStartingWith(String category) {
+    public MappedReactiveResultSet<Expense> findByCategoryStartingWith(String category) {
         BoundStatement bs = preparedStatement.bind();
         bs = bs.set("category", category+"%", String.class);
-        return session.execute(bs).map(expenseHelper::get);
+        return new DefaultMappedReactiveResultSet<Expense>(session.executeReactive(bs), expenseHelper::get);
     }
 }

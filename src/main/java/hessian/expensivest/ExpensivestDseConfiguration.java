@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
 
@@ -19,26 +18,36 @@ public class ExpensivestDseConfiguration {
     public String contactPoints;
 
     @Value("${dse.port}")
-    private int port = 9042;
+    private int port;
 
     @Value("${dse.keyspace}")
-    private String keyspace = "expensivest";
+    private String keyspace;
 
-    @Value("dc1")
+    @Value("${dse.localDc}")
     private String localDatacenter;
+
+    @Value("${dse.table}")
+    private String table;
 
     public String getContactPoints() {
         return contactPoints;
-    }
-
-    public String getKeyspaceName() {
-        return keyspace;
     }
 
     public int getPort() {
         return port;
     }
 
+    public String getKeyspace() {
+        return keyspace;
+    }
+
+    public String getLocalDatacenter() {
+        return localDatacenter;
+    }
+
+    public String getTable() {
+        return table;
+    }
 
     @Bean
     public DseSession dseSession() {
@@ -55,7 +64,7 @@ public class ExpensivestDseConfiguration {
 
     @Bean
     public ExpenseDao expenseDao(ExpenseMapper expenseMapper) {
-        return expenseMapper.expenseDao(keyspace, "expenses");
+        return expenseMapper.expenseDao(keyspace, table);
     }
 
 }
