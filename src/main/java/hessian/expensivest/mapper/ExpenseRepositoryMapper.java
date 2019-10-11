@@ -6,6 +6,7 @@ import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.mapping.MappingManager;
 import com.datastax.driver.mapping.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
@@ -21,6 +22,8 @@ public class ExpenseRepositoryMapper {
     private MappingManager mappingManager;
     private Mapper<Expense> mapper;
     private Session session;
+    @Value("${dse.keyspace}")
+    private static String keyspace;
 
     @Autowired
     public ExpenseRepositoryMapper(MappingManager mappingManager) {
@@ -44,10 +47,10 @@ public class ExpenseRepositoryMapper {
         psSumCountByUser = session.prepare(builtSumCountByUser);
         psSumCountByUserAndTrip = session.prepare(builtSumCountByUserAndTrip);
 
-        //session.prepare("SELECT * FROM expensivest.expenses WHERE category LIKE :category");
+        /* ToDo: No Support for Search in Apollo yet
         psFindByCategoryLike = session.prepare(builtFindByCategoryLike);
-        //session.prepare("SELECT * FROM expensivest.expenses WHERE category LIKE :category");
         psFindByCategoryStartingWith = session.prepare(builtFindByCategoryStartingWith);
+        */
     }
 
     // Save
@@ -79,14 +82,14 @@ public class ExpenseRepositoryMapper {
     }
 
     // Find
-    private static BuiltStatement builtFindAll = QueryBuilder.select().all().from("expensivest", "expenses");
+    private static BuiltStatement builtFindAll = QueryBuilder.select().all().from(keyspace, "expenses");
     private PreparedStatement psFindAll;
     public List<Expense> findAll() {
         BoundStatement bs = psFindAll.bind();
         return mapper.map(session.execute(bs)).all();
     }
 
-    private BuiltStatement builtFindSome = QueryBuilder.select().all().from("expensivest", "expenses").limit(bindMarker("lmt"));
+    private BuiltStatement builtFindSome = QueryBuilder.select().all().from(keyspace, "expenses").limit(bindMarker("lmt"));
     private PreparedStatement psFindSome;
     public List<Expense> findSome(Integer some) {
         BoundStatement bs = psFindSome.bind();
@@ -94,7 +97,7 @@ public class ExpenseRepositoryMapper {
         return mapper.map(session.execute(bs)).all();
     }
 
-    private static BuiltStatement builtFindByKeyUser = QueryBuilder.select().all().from("expensivest", "expenses").where(eq("user", bindMarker("user")));
+    private static BuiltStatement builtFindByKeyUser = QueryBuilder.select().all().from(keyspace, "expenses").where(eq("user", bindMarker("user")));
     private PreparedStatement psFindByKeyUser;
     public List<Expense> findByKeyUser(String user) {
         BoundStatement bs = psFindByKeyUser.bind();
@@ -102,7 +105,7 @@ public class ExpenseRepositoryMapper {
         return mapper.map(session.execute(bs)).all();
     }
 
-    private static BuiltStatement builtFindByKeyUserAndKeyTrip = QueryBuilder.select().all().from("expensivest", "expenses")
+    private static BuiltStatement builtFindByKeyUserAndKeyTrip = QueryBuilder.select().all().from(keyspace, "expenses")
             .where(eq("user", bindMarker("user"))).and(eq("trip", bindMarker("trip")));
     private PreparedStatement psFindByKeyUserAndKeyTrip;
     public List<Expense> findByKeyUserAndKeyTrip(String user, String trip) {
@@ -112,8 +115,9 @@ public class ExpenseRepositoryMapper {
         return mapper.map(session.execute(bs)).all();
     }
 
-    private static BuiltStatement builtFindByCategory = QueryBuilder.select().all().from("expensivest", "expenses")
-            .where(eq("category", bindMarker("category")));
+    // ToDo: Adding .allowFiltering() since Apollo doesn't support Search yet
+    private static BuiltStatement builtFindByCategory = QueryBuilder.select().all().from(keyspace, "expenses")
+            .where(eq("category", bindMarker("category"))).allowFiltering();
     private PreparedStatement psFindByCategory;
     public List<Expense> findByCategory(String category) {
         BoundStatement bs = psFindByCategory.bind();
@@ -121,8 +125,9 @@ public class ExpenseRepositoryMapper {
         return mapper.map(session.execute(bs)).all();
     }
 
-    private static BuiltStatement builtFindByAmountGreaterThan = QueryBuilder.select().all().from("expensivest", "expenses")
-            .where(gt("amount", bindMarker("amount")));
+    // ToDo: Adding .allowFiltering() since Apollo doesn't support Search yet
+    private static BuiltStatement builtFindByAmountGreaterThan = QueryBuilder.select().all().from(keyspace, "expenses")
+            .where(gt("amount", bindMarker("amount"))).allowFiltering();
     private PreparedStatement psFindByAmountGreaterThan;
     public List<Expense> findByAmountGreaterThan(Double amount) {
         BoundStatement bs = psFindByAmountGreaterThan.bind();
@@ -130,8 +135,8 @@ public class ExpenseRepositoryMapper {
         return mapper.map(session.execute(bs)).all();
     }
 
-    //session.prepare("SELECT * FROM expensivest.expenses WHERE category LIKE :category");
-    private static BuiltStatement builtFindByCategoryLike = QueryBuilder.select().all().from("expensivest", "expenses")
+    /* ToDo: No Support for Search in Apollo yet
+    private static BuiltStatement builtFindByCategoryLike = QueryBuilder.select().all().from(keyspace, "expenses")
             .where(like("category", bindMarker("category")));
     private PreparedStatement psFindByCategoryLike;
     public List<Expense> findByCategoryLike(String category) {
@@ -140,7 +145,7 @@ public class ExpenseRepositoryMapper {
         return mapper.map(session.execute(bs)).all();
     }
 
-    private static BuiltStatement builtFindByCategoryStartingWith = QueryBuilder.select().all().from("expensivest", "expenses")
+    private static BuiltStatement builtFindByCategoryStartingWith = QueryBuilder.select().all().from(keyspace, "expenses")
             .where(like("category", bindMarker("category")));
     private PreparedStatement psFindByCategoryStartingWith;
     public List<Expense> findByCategoryStartingWith(String category) {
@@ -148,10 +153,11 @@ public class ExpenseRepositoryMapper {
         bs.set("category", category+"%", String.class);
         return mapper.map(session.execute(bs)).all();
     }
+    */
 
     private static BuiltStatement builtSumCountGlobal = QueryBuilder.select().sum(column("amount")).as("sum_val")
             .count(column("amount")).as("count_val")
-            .from("expensivest", "expenses");
+            .from(keyspace, "expenses");
     private PreparedStatement psSumCountGlobal;
     public SumCount sumCountGlobal() {
         return new SumCount(session.execute(psSumCountGlobal.bind()).one());
@@ -160,7 +166,7 @@ public class ExpenseRepositoryMapper {
     private static BuiltStatement builtSumCountByUser = QueryBuilder.select().column("user")
             .sum(column("amount")).as("sum_val")
             .count(column("amount")).as("count_val")
-            .from("expensivest", "expenses")
+            .from(keyspace, "expenses")
             .groupBy(column("user"));
     private PreparedStatement psSumCountByUser;
     public List<SumCount> sumCountByUser() {
@@ -170,7 +176,7 @@ public class ExpenseRepositoryMapper {
     private static BuiltStatement builtSumCountByUserAndTrip = QueryBuilder.select().column("user").column("trip")
             .sum(column("amount")).as("sum_val")
             .count(column("amount")).as("count_val")
-            .from("expensivest", "expenses")
+            .from(keyspace, "expenses")
             .groupBy(column("user"), column("trip"));
     private PreparedStatement psSumCountByUserAndTrip;
     public List<SumCount> sumCountByUserAndTrip() {

@@ -410,6 +410,7 @@ public class ExpenseController {
         return returnString("<h4>Records for category " + category + "</h4>" + makeTable(repository.findByCategory(anyParser.parse(category, String.class))));
     }
 
+    /* ToDo: No Support for Search in Apollo yet
     @RequestMapping(value = "web/category/like", method = RequestMethod.POST)
     @ResponseBody
     public String categoryLike(@RequestParam String category) throws ParseException {
@@ -421,6 +422,7 @@ public class ExpenseController {
     public String categoryStarts(@RequestParam String category) throws ParseException {
         return returnString("<h4>Records for category starting " + category + "</h4>" + makeTable(repository.findByCategoryStartingWith(anyParser.parse(category, String.class))));
     }
+    */
 
     @RequestMapping(value = "web/amount/gt", method = RequestMethod.POST)
     @ResponseBody

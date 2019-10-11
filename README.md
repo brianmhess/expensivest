@@ -14,6 +14,20 @@ I then added the following dependencies:
 * Actuator
 * Cassandra
 
+### Create your cluster
+In Apollo create a new cluster.  Set the name of the keyspace as `expensivest`.  You do not need to use
+that name, but if you change it, make sure to change the `dse.keyspace` value in `application.properties`.
+
+You will need to add your credentials zip file to the project.  Add that
+zip file as `creds.zip` in the `resources/` directory of the project.  If you 
+want you can change the name of the zip file in the resource, but if you do, make
+sure to change the value of `apollo.credentials` in `application.properties`, and make
+sure to prepend a `/` to the file name.  For example, if the file you add is named
+`creds-mycluster1.zip` then the value for `apollo.credentials` would be `/creds-mycluster1.zip`.
+
+You must also set the `dse.username` and `dse.password` properties
+in `application.properties`.
+
 ### Data Model
 The information that we are tracking are:
 1. User (text)
@@ -24,11 +38,6 @@ The information that we are tracking are:
 6. Comment (text)
 
 The table schema is:
-
-```
-CREATE KEYSPACE IF NOT EXISTS expensivest WITH replication =
-    {'class': 'SimpleStrategy', 'replication_factor': '1'};
-```
 ```
 CREATE TABLE IF NOT EXISTS expensivest.expenses(
     user TEXT,
@@ -39,18 +48,17 @@ CREATE TABLE IF NOT EXISTS expensivest.expenses(
     comment TEXT,
     PRIMARY KEY ((user), trip, expts)
 ) WITH CLUSTERING ORDER BY (trip ASC, expts DESC);
-
-CREATE SEARCH INDEX IF NOT EXISTS ON expensivest.expenses;
 ```
 
 ### Webpage
-Navigate to `http://localhost:8222/` to see a "Hello World" message.
-
-Navigate to `http://localhost:8222/web` to see a webpage interface to
+Navigate to `http://localhost:8222/` or `http://localhost:8222/web` to see a webpage interface to
 Expensivest, including create, delete, and various find queries.
 
+This has a set of forms to interact in a simple way with the REST APIs.
+
 ### REST Endpoints with Spring Data Cassandra
-Navigate to `http://localhost:8222/api` to see the list of endpoints
+There are a variety of REST endpoints backed by Spring Data Cassandra
+found at `http://localhost:8222/api`:
 ```
 Endpoint                                  | Return
 ------------------------------------------|-----------------------------------------------------
@@ -58,8 +66,6 @@ api/hello                                 | Prints Hello World
 api/user?user={user}                      | Prints all expenses for "user"
 api/user_trip?user={user}&trip={trip}     | Prints all expenses for "user" for "trip"
 api/category?category={category}          | Prints all expenses for "category"
-api/category/like?category={category}     | Prints all expenses for category like "category"
-api/category/starting?category={category} | Prints all expenses for category starting with "category"
 api/amount/gt?amount={amount}             | Prints all expenses for amount greater than "amount"
 api/add                                   | Adds expense based on POSTed data
 api/delete                                | Deletes expense based on POSTed data
@@ -72,14 +78,13 @@ curl http://localhost:8222/api
 curl http://localhost:8222/api/user?user=bhess
 curl http://localhost:8222/api/user_trip?user=bhess&trip=first
 curl http://localhost:8222/api/category?category=fun
-curl http://localhost:8222/api/category/like?category=fu%
-curl http://localhost:8222/api/category/starting?category=f
 curl http://localhost:8222/api/amount/gt?amount=250
 curl -H "Content-Type: application/json" -d '{"key": {"user":"bhess", "trip":"first", "expts":"2018-01-01T01:00:00"}, "category":"work", "amount":"10.00", "comment":"NA"}' http://localhost:8222/api/add
 ```
 
 ### REST Endpoints with DSE Object Mapper
-Navigate to `http://localhost:8222/dse` to see the list of endpoints
+There are a variety of REST endpoints backed by Spring Data Cassandra
+found at `http://localhost:8222/dse`:
 ```
 Endpoint                                  | Return
 ------------------------------------------|-----------------------------------------------------
@@ -87,8 +92,6 @@ dse/hello                                 | Prints Hello World
 dse/user?user={user}                      | Prints all expenses for "user"
 dse/user_trip?user={user}&trip={trip}     | Prints all expenses for "user" for "trip"
 dse/category?category={category}          | Prints all expenses for "category"
-dse/category/like?category={category}     | Prints all expenses for category like "category"
-dse/category/starting?category={category} | Prints all expenses for category starting with "category"
 dse/amount/gt?amount={amount}             | Prints all expenses for amount greater than "amount"
 dse/add                                   | Adds expense based on POSTed data
 dse/delete                                | Deletes expense based on POSTed data
@@ -104,12 +107,20 @@ curl http://localhost:8222/dse
 curl http://localhost:8222/dse/user?user=bhess
 curl http://localhost:8222/dse/user_trip?user=bhess&trip=first
 curl http://localhost:8222/dse/category?category=fun
-curl http://localhost:8222/dse/category/like?category=fu%
-curl http://localhost:8222/dse/category/starting?category=f
 curl http://localhost:8222/dse/amount/gt?amount=250
 curl -H "Content-Type: application/json" -d '{user":"bhess", "trip":"first", "expts":"2018-01-01 01:00:00", "category":"work", "amount":"10.00", "comment":"NA"}' http://localhost:8222/dse/add
 curl http://localhost:8222/dse/sum_count/global
 curl http://localhost:8222/dse/sum_count/user
 curl http://localhost:8222/dse/sum_count/user_and_trip
+```
 
+### Actuator
+Actuator has been set for this project.  There is also a health indicator
+showing the state of DSE at
+```
+http://localhost:8222/actuator
+```
+and
+```
+http://localhost:8222/actuator/health
 ```

@@ -56,6 +56,7 @@ public class ExpenseControllerSpring {
         return expenseRepositorySpring.findByAmountGreaterThan(anyParser.parse(amount, Double.class));
     }
 
+    /* ToDo: No Support for Search in Apollo yet
     // String search queries
     @RequestMapping(value = "api/category/like", method = {RequestMethod.POST, RequestMethod.GET})
     public List<Expense> categoryLike(@RequestParam String category) throws ParseException {
@@ -66,6 +67,7 @@ public class ExpenseControllerSpring {
     public List<Expense> categoryStarting(@RequestParam String category) throws ParseException {
         return expenseRepositorySpring.findByCategoryStartingWith(anyParser.parse(category, String.class));
     }
+    */
 
     @RequestMapping(value = "api")
     public String usage() {
