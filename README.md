@@ -24,6 +24,9 @@ sure to change the value of `apollo.credentials` in `application.properties`, an
 sure to prepend a `/` to the file name.  For example, if the file you add is named
 `creds-mycluster1.zip` then the value for `apollo.credentials` would be `/creds-mycluster1.zip`.
 
+You must also set the `dse.username` and `dse.password` properties
+in `application.properties`.
+
 ### Data Model
 The information that we are tracking are:
 1. User (text)
