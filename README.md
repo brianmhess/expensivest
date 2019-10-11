@@ -47,8 +47,6 @@ CREATE TABLE IF NOT EXISTS expensivest.expenses(
     comment TEXT,
     PRIMARY KEY ((user), trip, expts)
 ) WITH CLUSTERING ORDER BY (trip ASC, expts DESC);
-
-CREATE SEARCH INDEX IF NOT EXISTS ON expensivest.expenses;
 ```
 
 ### Webpage
@@ -90,13 +88,6 @@ curl http://localhost:8222/dse/sum_count/global
 curl http://localhost:8222/dse/sum_count/user
 curl http://localhost:8222/dse/sum_count/user_and_trip
 ```
-
-### Webpage
-There is a simple web interface with forms at 
-```
-http://localhost:8222/
-```
-This has a set of forms to interact in a simple way with the REST APIs.
 
 ### Actuator
 Actuator has been set for this project.  There is also a health indicator
