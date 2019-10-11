@@ -3,7 +3,6 @@ package hessian.expensivest.mapper;
 import com.datastax.oss.driver.api.mapper.annotations.ClusteringColumn;
 import com.datastax.oss.driver.api.mapper.annotations.Entity;
 import com.datastax.oss.driver.api.mapper.annotations.PartitionKey;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import hessian.typeparser.AnyParser;
 
 import java.text.ParseException;
