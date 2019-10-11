@@ -124,6 +124,7 @@ public class ExpenseController {
         sb.append("    <div class=\"button\"><button type=\"submit\">Find By Category</button></div>\n");
         sb.append("  </form>\n");
 
+        /* ToDo: No Support for Search in Apollo yet
         sb.append("  <hr>\n");
         sb.append("  <h4>Find By Category Like</h4>\n");
         sb.append("  <form action=\"/web/category/like\" method=\"post\">\n");
@@ -143,6 +144,7 @@ public class ExpenseController {
         sb.append("    <div>\n");
         sb.append("    <div class=\"button\"><button type=\"submit\">Find By Category Starting With</button></div>\n");
         sb.append("  </form>\n");
+        */
 
         sb.append("  <hr>\n");
         sb.append("  <h4>Find Big Expenses</h4>\n");
@@ -424,6 +426,7 @@ public class ExpenseController {
         return returnString("<h4>Records for category " + category + "</h4>" + makeTable(repository.findByCategory(anyParser.parse(category, String.class))));
     }
 
+    /* ToDo: No Support for Search in Apollo yet
     @RequestMapping(value = "web/category/like", method = RequestMethod.POST)
     @ResponseBody
     public String categoryLike(@RequestParam String category) throws ParseException {
@@ -435,6 +438,7 @@ public class ExpenseController {
     public String categoryStarts(@RequestParam String category) throws ParseException {
         return returnString("<h4>Records for category starting " + category + "</h4>" + makeTable(repository.findByCategoryStartingWith(anyParser.parse(category, String.class))));
     }
+    */
 
     @RequestMapping(value = "web/amount/gt", method = RequestMethod.POST)
     @ResponseBody

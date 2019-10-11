@@ -8,52 +8,75 @@ import hessian.expensivest.mapper.ExpenseMapperBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.StreamUtils;
 
-import java.net.InetSocketAddress;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 
 @Configuration
 public class ExpensivestDseConfiguration {
-    @Value("${dse.contactPoints}")
-    public String contactPoints;
-
-    @Value("${dse.port}")
-    private int port;
-
     @Value("${dse.keyspace}")
     private String keyspace;
-
-    @Value("${dse.localDc}")
-    private String localDatacenter;
 
     @Value("${dse.table}")
     private String table;
 
-    public String getContactPoints() {
-        return contactPoints;
-    }
+    @Value("${apollo.credentials}")
+    private String apolloCredentials;
 
-    public int getPort() {
-        return port;
-    }
+    @Value("${dse.username}")
+    private String username;
+
+    @Value("${dse.password}")
+    private String password;
+
+    private File apolloCredentialsFile;
 
     public String getKeyspace() {
-        return keyspace;
-    }
-
-    public String getLocalDatacenter() {
-        return localDatacenter;
+        return this.keyspace;
     }
 
     public String getTable() {
-        return table;
+        return this.table;
+    }
+
+    public String getApolloCredentials() {
+        return this.apolloCredentials;
+    }
+
+    public File getApolloCredentialsFile() {
+        return this.apolloCredentialsFile;
+    }
+
+    public String getUsername() {
+        return this.username;
+    }
+
+    public String getPassword() {
+        return this.password;
     }
 
     @Bean
     public DseSession dseSession(LastUpdatedStateListener lastUpdatedStateListener, LastUpdatedSchemaListener lastUpdateSchemaListener) {
-        DseSessionBuilder dseSessionBuilder = DseSession.builder().withLocalDatacenter(localDatacenter);
-        for (String s : contactPoints.split(","))
-                dseSessionBuilder.addContactPoint(InetSocketAddress.createUnresolved(s, port));
+        try {
+            this.apolloCredentialsFile = File.createTempFile("dsecscb", ".zip");
+            FileOutputStream fos = new FileOutputStream(this.apolloCredentialsFile);
+            InputStream credsInputStream = this.getClass().getResourceAsStream(this.apolloCredentials);
+            StreamUtils.copy(credsInputStream, fos);
+            credsInputStream.close();
+            fos.close();
+        }
+        catch (IOException ioe) {
+            throw new RuntimeException("Could not save cloud secure connect bundle to filesystem ("
+                    + ((null == this.apolloCredentialsFile) ? " <null> " : this.apolloCredentialsFile.getAbsolutePath()) + ")");
+        }
+
+        DseSessionBuilder dseSessionBuilder = DseSession.builder()
+                .withCloudSecureConnectBundle(this.apolloCredentialsFile.getAbsolutePath())
+                .withAuthCredentials(this.username, this.password);
         dseSessionBuilder.withNodeStateListener(lastUpdatedStateListener);
         dseSessionBuilder.withSchemaChangeListener(lastUpdateSchemaListener);
 

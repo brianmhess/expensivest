@@ -54,7 +54,8 @@ public class StateListeningHealthIndicator implements HealthIndicator {
         if (!metadata.getTokenMap().isPresent())
             return Health.unknown().build();
         TokenMap tokenMap = metadata.getTokenMap().get();
-        if (null == keyspace) {            List<String> keyspaces = findKeyspacesForDataCenter(datacenter, metadata, tokenMap);
+        if (null == keyspace) {
+            List<String> keyspaces = findKeyspacesForDataCenter(datacenter, metadata, tokenMap);
             if (0 == keyspaces.size())
                 return Health.unknown().build();
             keyspace = keyspaces.get(0);
@@ -66,7 +67,7 @@ public class StateListeningHealthIndicator implements HealthIndicator {
                     .filter(h -> (0 == h.getDatacenter().compareTo(datacenter)))
                     .filter(h -> (h.getState() == NodeState.UP))
                     .count();
-            if (numReplicasUp > (numReplicas + 1)/2)
+            if (numReplicasUp < (numReplicas + 1)/2)
                 badTokenRanges.add(tr);
         }
         List<Node> badHosts = metadata.getNodes().values()

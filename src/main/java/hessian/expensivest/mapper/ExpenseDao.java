@@ -32,17 +32,19 @@ public interface ExpenseDao {
     @Select(customWhereClause = "user = :user AND trip = :trip")
     public MappedReactiveResultSet<Expense> findByKeyUserAndKeyTrip(String user, String trip);
 
-    @Select(customWhereClause = "category = :category")
+    @Select(customWhereClause = "category = :category", allowFiltering = true)
     public MappedReactiveResultSet<Expense> findByCategory(String category);
 
-    @Select(customWhereClause = "amount > :amount")
+    @Select(customWhereClause = "amount > :amount", allowFiltering = true)
     public MappedReactiveResultSet<Expense> findByAmountGreaterThan(Double amount);
 
+    /* ToDo: No Support for Search in Apollo yet
     @Select(customWhereClause = "category LIKE :category")
     public MappedReactiveResultSet<Expense> findByCategoryLike(String category);
 
     @QueryProvider(providerClass = ExpenseDaoQueryProvider.class, entityHelpers = Expense.class)
     public MappedReactiveResultSet<Expense> findByCategoryStartingWith(String category);
+    */
 
 
     // Sums and Counts

@@ -67,6 +67,7 @@ public class ExpenseControllerMapper {
         return Flux.from(repository.findByAmountGreaterThan(anyParser.parse(amount, Double.class)));
     }
 
+    /* ToDo: No Support for Search in Apollo yet
     // String search queries
     @RequestMapping(value = "dse/category/like", method = {RequestMethod.POST, RequestMethod.GET})
     public Flux<Expense> categoryLike(@RequestParam String category) throws ParseException {
@@ -77,6 +78,7 @@ public class ExpenseControllerMapper {
     public Flux<Expense> categoryStarts(@RequestParam String category) throws ParseException {
         return Flux.from(repository.findByCategoryStartingWith(anyParser.parse(category, String.class)));
     }
+    */
 
     // Aggregates
     @RequestMapping(value = "dse/sum_count/global")
