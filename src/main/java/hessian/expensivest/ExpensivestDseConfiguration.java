@@ -50,11 +50,24 @@ public class ExpensivestDseConfiguration {
     }
 
     @Bean
-    public DseSession dseSession() {
+    public DseSession dseSession(LastUpdatedStateListener lastUpdatedStateListener, LastUpdatedSchemaListener lastUpdateSchemaListener) {
         DseSessionBuilder dseSessionBuilder = DseSession.builder().withLocalDatacenter(localDatacenter);
         for (String s : contactPoints.split(","))
                 dseSessionBuilder.addContactPoint(InetSocketAddress.createUnresolved(s, port));
+        dseSessionBuilder.withNodeStateListener(lastUpdatedStateListener);
+        dseSessionBuilder.withSchemaChangeListener(lastUpdateSchemaListener);
+
         return dseSessionBuilder.build();
+    }
+
+    @Bean
+    public LastUpdatedStateListener lastUpdatedStateListener() {
+        return new LastUpdatedStateListener();
+    }
+
+    @Bean
+    public LastUpdatedSchemaListener lastUpdatedSchemaListener() {
+        return new LastUpdatedSchemaListener();
     }
 
     @Bean
