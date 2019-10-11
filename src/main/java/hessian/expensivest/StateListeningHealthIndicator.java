@@ -17,7 +17,8 @@ public class StateListeningHealthIndicator implements HealthIndicator {
     private Health lastHealth = Health.unknown().build();
 
     @Autowired
-    private DseSession session;    @Autowired
+    private DseSession session;
+    @Autowired
     LastUpdatedStateListener lastUpdatedStateListener;
     @Autowired
     LastUpdatedSchemaListener lastUpdatedSchemaListener;
