@@ -45,7 +45,7 @@ public class StateListeningHealthIndicator implements HealthIndicator {
             long numReplicas = metadata.getReplicas(keyspaceName, tr)
                     .stream().filter(h -> (0 == h.getDatacenter().compareTo(datacenter))).count();
             long minReplicas = (numReplicas + 1) / 2;
-            if (minReplicas > metadata.getReplicas(session.getLoggedKeyspace(), tr)
+            if (minReplicas > metadata.getReplicas(keyspace, tr)
                     .stream()
                     .filter(h -> (0 == h.getDatacenter().compareTo(datacenter)))
                     .filter(Host::isUp).count())
