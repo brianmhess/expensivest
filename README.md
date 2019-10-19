@@ -47,7 +47,11 @@ CREATE SEARCH INDEX IF NOT EXISTS ON expensivest.expenses;
 You can configure application.properties located under src/java/resources
 
 mvn clean package
+
 mvn spring-boot:run
+or
+java -jar target/expensivest-0.0.1-SNAPSHOT.jar
+
 
 ### Webpage
 Navigate to `http://localhost:8222/` to see a "Hello World" message.
