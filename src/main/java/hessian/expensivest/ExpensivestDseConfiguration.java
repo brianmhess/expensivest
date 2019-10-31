@@ -58,7 +58,7 @@ public class ExpensivestDseConfiguration {
     @Bean
     public DseSession dseSession(LastUpdatedStateListener lastUpdatedStateListener, LastUpdatedSchemaListener lastUpdateSchemaListener) {
         DseSessionBuilder dseSessionBuilder = DseSession.builder()
-                .withCloudSecureConnectBundle(this.getClass().getResourceAsStream(this.apolloCredentials))//(this.apolloCredentialsFile.getAbsolutePath())
+                .withCloudSecureConnectBundle(this.getClass().getResourceAsStream(this.apolloCredentials))
                 .withAuthCredentials(this.username, this.password);
         dseSessionBuilder.withNodeStateListener(lastUpdatedStateListener);
         dseSessionBuilder.withSchemaChangeListener(lastUpdateSchemaListener);
