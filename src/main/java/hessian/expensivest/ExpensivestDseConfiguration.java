@@ -29,8 +29,6 @@ public class ExpensivestDseConfiguration {
     @Value("${dse.password}")
     private String password;
 
-    private File apolloCredentialsFile;
-
     public String getKeyspace() {
         return this.keyspace;
     }
@@ -41,10 +39,6 @@ public class ExpensivestDseConfiguration {
 
     public String getApolloCredentials() {
         return this.apolloCredentials;
-    }
-
-    public File getApolloCredentialsFile() {
-        return this.apolloCredentialsFile;
     }
 
     public String getUsername() {
