@@ -7,13 +7,6 @@ import com.datastax.driver.mapping.MappingManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.StreamUtils;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
 
 @Configuration
 public class ExpensivestDseConfiguration {
@@ -36,22 +29,8 @@ public class ExpensivestDseConfiguration {
 
     @Bean
     public DseCluster dseCluster() {
-        File apolloCredentialsFile = null;
-        try {
-            apolloCredentialsFile = File.createTempFile("dsecscb", ".zip");
-            FileOutputStream fos = new FileOutputStream(apolloCredentialsFile);
-            InputStream credsInputStream = this.getClass().getResourceAsStream(apolloCredentials);
-            StreamUtils.copy(credsInputStream, fos);
-            credsInputStream.close();
-            fos.close();
-        }
-        catch (IOException ioe) {
-            throw new RuntimeException("Could not save cloud secure connect bundle to filesystem ("
-                    + ((null == apolloCredentialsFile) ? "<null>" : apolloCredentialsFile.getAbsolutePath()) + ")");
-        }
-
         DseCluster.Builder dseClusterBuilder = DseCluster.builder()
-                .withCloudSecureConnectBundle(apolloCredentialsFile.getAbsolutePath())
+                .withCloudSecureConnectBundle(this.getClass().getResourceAsStream(apolloCredentials))
                 .withCredentials(this.username, this.password);
 
         return dseClusterBuilder.build();

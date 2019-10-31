@@ -20,7 +20,7 @@
 
 	<properties>
 		<!-- DSE -->
-		<dse-java-driver.version>1.8.2-cloud-01</dse-java-driver.version>
+		<dse-java-driver.version>1.9.0</dse-java-driver.version>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -29,16 +29,6 @@
 	</properties>
 
 	<repositories>
-		<repository>
-			<id>datastax-releases-public-local</id>
-			<url>https://repo.datastax.com/datastax-public-releases-local/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
 		<repository>
 			<id>data-local</id>
 			<name>datat2</name>
