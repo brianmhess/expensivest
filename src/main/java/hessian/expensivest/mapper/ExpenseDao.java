@@ -24,22 +24,22 @@ public interface ExpenseDao {
     public MappedReactiveResultSet<Expense> findAll();
 
     @Query("SELECT * FROM ${keyspaceId}.${tableId} LIMIT :some")
-    public MappedReactiveResultSet<Expense> findSome(Integer some);
+    public MappedReactiveResultSet<Expense> findSome(@CqlName("some") Integer some);
 
     @Select(customWhereClause = "user = :user")
-    public MappedReactiveResultSet<Expense> findByKeyUser(String user);
+    public MappedReactiveResultSet<Expense> findByKeyUser(@CqlName("user") String user);
 
     @Select(customWhereClause = "user = :user AND trip = :trip")
-    public MappedReactiveResultSet<Expense> findByKeyUserAndKeyTrip(String user, String trip);
+    public MappedReactiveResultSet<Expense> findByKeyUserAndKeyTrip(@CqlName("user") String user, @CqlName("trip") String trip);
 
     @Select(customWhereClause = "category = :category")
-    public MappedReactiveResultSet<Expense> findByCategory(String category);
+    public MappedReactiveResultSet<Expense> findByCategory(@CqlName("category") String category);
 
     @Select(customWhereClause = "amount > :amount")
-    public MappedReactiveResultSet<Expense> findByAmountGreaterThan(Double amount);
+    public MappedReactiveResultSet<Expense> findByAmountGreaterThan(@CqlName("amount") Double amount);
 
     @Select(customWhereClause = "category LIKE :category")
-    public MappedReactiveResultSet<Expense> findByCategoryLike(String category);
+    public MappedReactiveResultSet<Expense> findByCategoryLike(@CqlName("category") String category);
 
     @QueryProvider(providerClass = ExpenseDaoQueryProvider.class, entityHelpers = Expense.class)
     public MappedReactiveResultSet<Expense> findByCategoryStartingWith(String category);
