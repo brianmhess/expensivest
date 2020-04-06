@@ -93,7 +93,7 @@ public class ExpenseControllerMapper {
         return repository.sumCountByUserAndTrip();
     }
 
-    @RequestMapping(value = "dse")
+    @RequestMapping(value = "dse", method = {RequestMethod.POST, RequestMethod.GET})
     public String usage() {
         return "<!DOCTYPE html>\n" +
                 "<html>\n" +
